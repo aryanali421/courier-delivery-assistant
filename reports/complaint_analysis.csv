@@ -1,0 +1,10 @@
+comment_id,text,sentiment_label,compound_score,predicted_sentiment,complaint_topics
+P05_F16,The repeated delay is frustrating and annoying.,negative,-0.7845,negative,['Delivery Delay']
+P05_F18,The unhelpful response was awful.,negative,-0.4588,negative,['Customer Service']
+P05_F13,The rude service was upsetting.,negative,-0.7269,negative,['Customer Service']
+P05_F17,The broken item was unacceptable.,negative,-0.7269,negative,['Package Damage']
+P05_F14,The missing parcel is worrying.,negative,-0.5574,negative,['Missing Parcel']
+P05_F12,I am angry about the terrible delay.,negative,-0.8271,negative,['Delivery Delay']
+P05_F11,The damaged package was very disappointing.,negative,-0.7501,negative,['Package Damage']
+P05_F15,I am unhappy with the poor packaging.,negative,-0.7096,negative,['Packaging Issues']
+P05_F20,The staff were polite but the damaged package is unacceptable.,negative,-0.8338,negative,['Package Damage']

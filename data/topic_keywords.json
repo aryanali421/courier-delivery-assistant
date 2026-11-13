@@ -1,0 +1,17 @@
+{
+  "timeliness": [
+    "late",
+    "delay",
+    "time"
+  ],
+  "parcel": [
+    "parcel",
+    "damaged",
+    "package"
+  ],
+  "service": [
+    "staff",
+    "service",
+    "support"
+  ]
+}

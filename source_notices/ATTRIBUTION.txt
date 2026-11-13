@@ -1,0 +1,6 @@
+Keras CIFAR10 data and class labels: https://keras.io/api/datasets/cifar10/
+
+Tabular scenarios for Projects 02 to 05 and all feedback examples were authored for this class. They are demonstration data, not observations from businesses or field collection.
+
+Image subsets retain the source class labels. They were sampled with seed 42 and resized only where needed. See image_manifest.csv. Train and test sources are kept separate when provided by the source. These small subsets are for classroom study. Keep notices with copies; the public GitHub app needs trained models, not the full image dataset.
+VADER lexicon: C. J. Hutto and Eric Gilbert, 2014, distributed through NLTK data. NLTK data source: https://github.com/nltk/nltk_data

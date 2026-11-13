@@ -1,0 +1,31 @@
+comment_id,text,sentiment_label,compound_score,predicted_sentiment
+P05_F28,The package has a printed label.,neutral,0.0,neutral
+P05_F16,The repeated delay is frustrating and annoying.,negative,-0.7845,negative
+P05_F24,The vehicle is a truck.,neutral,0.0,neutral
+P05_F18,The unhelpful response was awful.,negative,-0.4588,negative
+P05_F09,I am satisfied with the reliable delivery.,positive,0.4215,positive
+P05_F10,The quick and helpful response was excellent.,positive,0.7579,positive
+P05_F29,The delivery log contains five entries.,neutral,0.0,neutral
+P05_F25,The office opens at nine oclock.,neutral,0.0,neutral
+P05_F13,The rude service was upsetting.,negative,-0.7269,negative
+P05_F01,The delivery service was excellent.,positive,0.5719,positive
+P05_F05,I appreciate the careful packaging.,positive,0.5106,positive
+P05_F17,The broken item was unacceptable.,negative,-0.7269,negative
+P05_F06,The polite courier gave great service.,positive,0.6249,positive
+P05_F14,The missing parcel is worrying.,negative,-0.5574,negative
+P05_F12,I am angry about the terrible delay.,negative,-0.8271,negative
+P05_F23,The delivery form has four columns.,neutral,0.0,neutral
+P05_F02,The parcel arrived safely and I am very happy.,positive,0.8016,positive
+P05_F03,The helpful staff answered the question clearly.,positive,0.6705,positive
+P05_F26,The parcel weighs two kilograms.,neutral,0.0,neutral
+P05_F04,The fast delivery was wonderful.,positive,0.5719,positive
+P05_F22,The parcel was sent on Monday.,neutral,0.0,neutral
+P05_F27,The distance shown is eight kilometres.,neutral,0.0,neutral
+P05_F19,"Wonderful, another late parcel and another wasted afternoon.",negative,0.128,positive
+P05_F30,The parcel is on the second shelf.,neutral,0.0,neutral
+P05_F21,The package contains three books.,neutral,0.0,neutral
+P05_F08,The undamaged parcel was a pleasant surprise.,positive,0.6597,positive
+P05_F11,The damaged package was very disappointing.,negative,-0.7501,negative
+P05_F15,I am unhappy with the poor packaging.,negative,-0.7096,negative
+P05_F20,The staff were polite but the damaged package is unacceptable.,negative,-0.8338,negative
+P05_F07,The support team was friendly and patient.,positive,0.7096,positive
