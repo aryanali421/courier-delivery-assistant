@@ -1,0 +1,7 @@
+.streamlit/secrets.toml
+images.npz
+*.zip
+*.rar
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
