@@ -12,7 +12,68 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
-from app_helpers import check_record, offline_summary, sentiment_of, topic_of
+# All application helpers live inside this file.
+import math
+import re
+
+UNITS = {"distance_km":"km", "weight_kg":"kg", "traffic_index":"/ 5", "stops_count":"stops"}
+
+
+def check_record(record: dict, meta: dict) -> list[str]:
+    errors = []
+    ranges = meta["numeric_ranges"]
+    for feature in meta["numeric_features"]:
+        value = record.get(feature)
+        if value is None or value == "":
+            errors.append(f"{feature.replace('_',' ').title()} is required.")
+            continue
+        try:
+            number = float(value)
+            if not math.isfinite(number):
+                raise ValueError("not finite")
+        except (TypeError, ValueError):
+            errors.append(f"{feature.replace('_',' ').title()} must be a valid number.")
+            continue
+        lo, hi = ranges[feature]
+        if not lo <= number <= hi:
+            errors.append(f"{feature.replace('_',' ').title()} must be between {lo:g} and {hi:g} {UNITS.get(feature, '')}. Entered: {number:g}.")
+        if feature in ("traffic_index", "stops_count") and not number.is_integer():
+            errors.append(f"{feature.replace('_',' ').title()} must be a whole number.")
+    for feature in meta["categorical_features"]:
+        allowed = meta["category_values"][feature]
+        if record.get(feature) not in allowed:
+            errors.append(f"{feature.title()} must be one of: {', '.join(allowed)}.")
+    return errors
+
+
+def sentiment_of(value, analyser) -> str:
+    if value is None or pd.isna(value) or not str(value).strip():
+        return "empty"
+    compound = analyser.polarity_scores(str(value))["compound"]
+    return "positive" if compound >= 0.05 else "negative" if compound <= -0.05 else "neutral"
+
+
+def topic_of(value, keywords: dict) -> tuple[str, str | None]:
+    source = "" if value is None else str(value).lower()
+    for topic, words in keywords.items():
+        for word in words:
+            # Matches words, not e.g. 'time' embedded in 'sometimes'
+            if re.search(r"(?<!\w)" + re.escape(str(word).lower()) + r"(?!\w)", source):
+                return topic, str(word)
+    return "other", None
+
+
+def offline_summary(prediction: dict | None, group_label: str | None, sentiments: dict[str, int]) -> str:
+    if prediction is None:
+        opening = "No delivery estimate has been calculated yet. Enter a job in the Overview tab to include a duration and profile."
+    else:
+        opening = (f"The current demonstration estimate is {prediction['minutes']:.1f} minutes "
+                   f"for Group {prediction['group']} ({group_label or 'delivery profile'}).")
+    counts = ", ".join(f"{key}: {sentiments.get(key, 0)}" for key in ("positive", "neutral", "negative"))
+    return (f"{opening}\n\nThe 30 supplied classroom comments are classified as {counts}. "
+            "Review the common topics and check estimated durations against actual outcomes before making operational decisions. "
+            "These are illustrative results, not live customer data or guaranteed delivery times.")
+
 
 st.set_page_config(page_title="CourierDesk • Delivery Intelligence", page_icon="📦", layout="wide", initial_sidebar_state="expanded")
 ROOT = Path(__file__).resolve().parent
@@ -73,10 +134,27 @@ def section(kicker: str, name: str):
 
 
 def safe_secret(key: str, default=""):
+    """Read Streamlit Cloud secrets. No local TOML is required."""
     try:
         return st.secrets.get(key, default)
     except Exception:
         return default
+
+
+def groq_settings():
+    """Accept common Streamlit secret naming conventions."""
+    key = (safe_secret("GROQ_API_KEY") or safe_secret("groq_api_key") or
+           safe_secret("GROQ_KEY") or safe_secret("groq_key"))
+    model = safe_secret("GROQ_MODEL") or safe_secret("groq_model") or "openai/gpt-oss-20b"
+    try:
+        section = st.secrets.get("groq", {})
+        if not key:
+            key = section.get("api_key", "")
+        if model == "openai/gpt-oss-20b":
+            model = section.get("model", model)
+    except Exception:
+        pass
+    return str(key).strip(), str(model).strip()
 
 
 @st.cache_data(show_spinner=False)
@@ -352,10 +430,11 @@ with tabs[4]:
         st.download_button("Download summary (.txt)", data=summary, file_name="courierdesk_offline_summary.txt", mime="text/plain")
     else:
         st.write("The AI receives only aggregate calculated results and a short sanitized example; no images, contact details, or full files.")
-        api_key = safe_secret("GROQ_API_KEY")
-        model_id = safe_secret("GROQ_MODEL", "openai/gpt-oss-20b")
+        api_key, model_id = groq_settings()
         if not api_key:
-            st.warning("No GROQ_API_KEY configured. Offline summary remains available above when you select Offline summary.")
+            st.warning("Groq key not detected in Streamlit Cloud secrets. Add GROQ_API_KEY to the app's Secrets settings. No local file is needed.")
+        else:
+            st.caption(f"Groq configured · model: `{model_id}` · key stays private")
         if st.button("Generate AI summary", type="primary", disabled=not bool(api_key)):
             try:
                 from groq import Groq
@@ -378,7 +457,7 @@ with tabs[4]:
                 st.session_state.ai_result = output
             except Exception as exc:
                 st.session_state.ai_result = None
-                st.error(f"AI summary unavailable ({type(exc).__name__}). Free-tier quotas, connectivity, or model availability may be the cause; use Offline summary instead.")
+                st.error(f"AI summary unavailable: {type(exc).__name__}: {str(exc)[:350]}. Check Groq model access, key, and free-tier quota; offline mode remains available.")
         if st.session_state.ai_result:
             st.markdown("#### AI-generated summary")
             st.write(st.session_state.ai_result)
