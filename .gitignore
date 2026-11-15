@@ -1,0 +1,9 @@
+.streamlit/secrets.toml
+.env
+__pycache__/
+*.pyc
+*.rar
+*.zip
+.DS_Store
+# Never commit the full image training arrays.
+data/images.npz
