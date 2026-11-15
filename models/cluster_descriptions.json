@@ -1,0 +1,5 @@
+{
+    "0": "lower weight_kg, lower traffic_index",
+    "1": "higher traffic_index",
+    "2": "higher weight_kg, lower traffic_index"
+}

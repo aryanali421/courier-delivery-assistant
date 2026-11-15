@@ -1,0 +1,6 @@
+record_id,distance_km,weight_kg,traffic_index,stops_count,vehicle
+P05_0004,21.2,2.5,3,4,truck
+P05_0006,29.3,6.0,5,5,car
+P05_0008,23.8,4.9,4,4,truck
+P05_0010,14.1,7.0,1,1,car
+P05_0024,26.9,8.1,2,2,truck

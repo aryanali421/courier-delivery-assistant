@@ -1,0 +1,31 @@
+comment_id,text,sentiment_label
+P05_F28,The package has a printed label.,neutral
+P05_F16,The repeated delay is frustrating and annoying.,negative
+P05_F24,The vehicle is a truck.,neutral
+P05_F18,The unhelpful response was awful.,negative
+P05_F09,I am satisfied with the reliable delivery.,positive
+P05_F10,The quick and helpful response was excellent.,positive
+P05_F29,The delivery log contains five entries.,neutral
+P05_F25,The office opens at nine oclock.,neutral
+P05_F13,The rude service was upsetting.,negative
+P05_F01,The delivery service was excellent.,positive
+P05_F05,I appreciate the careful packaging.,positive
+P05_F17,The broken item was unacceptable.,negative
+P05_F06,The polite courier gave great service.,positive
+P05_F14,The missing parcel is worrying.,negative
+P05_F12,I am angry about the terrible delay.,negative
+P05_F23,The delivery form has four columns.,neutral
+P05_F02,The parcel arrived safely and I am very happy.,positive
+P05_F03,The helpful staff answered the question clearly.,positive
+P05_F26,The parcel weighs two kilograms.,neutral
+P05_F04,The fast delivery was wonderful.,positive
+P05_F22,The parcel was sent on Monday.,neutral
+P05_F27,The distance shown is eight kilometres.,neutral
+P05_F19,"Wonderful, another late parcel and another wasted afternoon.",negative
+P05_F30,The parcel is on the second shelf.,neutral
+P05_F21,The package contains three books.,neutral
+P05_F08,The undamaged parcel was a pleasant surprise.,positive
+P05_F11,The damaged package was very disappointing.,negative
+P05_F15,I am unhappy with the poor packaging.,negative
+P05_F20,The staff were polite but the damaged package is unacceptable.,negative
+P05_F07,The support team was friendly and patient.,positive

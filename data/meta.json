@@ -1,0 +1,79 @@
+{
+  "project_id": 5,
+  "title": "Courier Delivery Planning and Feedback Assistant",
+  "tabular_source": "Generated tabular practice data",
+  "generated_data": true,
+  "target": "delivery_minutes",
+  "target_definition": "delivery_minutes is the elapsed delivery duration. The starter CSV uses a noisy teaching recipe. In a real pilot, the outcome would be measured after completion and all predictors would need to be known at dispatch.",
+  "task": "regression",
+  "numeric_features": [
+    "distance_km",
+    "weight_kg",
+    "traffic_index",
+    "stops_count"
+  ],
+  "categorical_features": [
+    "vehicle"
+  ],
+  "cluster_features": [
+    "distance_km",
+    "weight_kg",
+    "traffic_index",
+    "stops_count"
+  ],
+  "numeric_ranges": {
+    "distance_km": [
+      1,
+      30
+    ],
+    "weight_kg": [
+      0.2,
+      15
+    ],
+    "traffic_index": [
+      1,
+      5
+    ],
+    "stops_count": [
+      0,
+      5
+    ]
+  },
+  "category_values": {
+    "vehicle": [
+      "car",
+      "truck"
+    ]
+  },
+  "tabular_rows": 1000,
+  "tabular_split_counts": {
+    "train": 700,
+    "test": 150,
+    "validation": 150
+  },
+  "image_source": "CIFAR10",
+  "image_classes": [
+    "car",
+    "truck"
+  ],
+  "image_shape": [
+    32,
+    32,
+    3
+  ],
+  "image_input_scale": "uint8 0 to 255; model rescales once",
+  "image_split_counts": {
+    "train": 800,
+    "validation": 200,
+    "test": 200
+  },
+  "feedback_rows": 30,
+  "feedback_label_counts": {
+    "neutral": 10,
+    "negative": 10,
+    "positive": 10
+  },
+  "feedback_origin": "Authored classroom examples with supplied reference labels; not a real survey",
+  "seed": 42,
+  "prepared_on": "2026-11-11"
+}

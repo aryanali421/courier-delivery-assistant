@@ -1,0 +1,5 @@
+model,MAE (min),RMSE (min),R2,split
+Decision tree,5.846,7.416,0.837,validation
+Baseline (mean),15.366,18.71,-0.039,validation
+Decision tree,5.461,6.718,0.891,test
+Baseline (mean),17.535,20.38,-0.0,test
