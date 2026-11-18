@@ -117,12 +117,6 @@ header[data-testid="stHeader"] { background: transparent; }
   font-size:1.35rem; box-shadow: 0 6px 18px rgba(234,88,12,.35); }
 .wb-name { font-size:1.65rem; font-weight:800; letter-spacing:-.02em; line-height:1.1; }
 .wb-tag { font-size:.92rem; opacity:.68; margin-top:.1rem; }
-.wb-chips { display:flex; gap:.45rem; flex-wrap:wrap; }
-.wb-chip { font-size:.78rem; font-weight:500; padding:.32rem .7rem; border-radius:999px;
-  border:1px solid var(--wb-line); background:var(--wb-soft); white-space:nowrap; }
-.wb-chip .dot { display:inline-block; width:7px; height:7px; border-radius:50%;
-  background:#22C55E; margin-right:.4rem; vertical-align:middle; }
-.wb-chip.accent { border-color: rgba(234,88,12,.45); color: var(--wb-accent); }
 
 /* Section headings */
 .wb-eyebrow { font-size:.72rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
@@ -592,27 +586,16 @@ def example_label(record_id: str) -> str:
 # Hero
 # --------------------------------------------------------------------------
 estimate_now = st.session_state.get("estimate")
-estimate_chip = (f'<span class="wb-chip accent">Current job · {estimate_now["minutes"]:.1f} min</span>'
-                 if estimate_now else "")
 html(
-    f"""
-<div class="wb-hero">
-  <div class="wb-brand">
-    <div class="wb-logo">W</div>
-    <div>
-      <div class="wb-name">{APP_NAME}</div>
-      <div class="wb-tag">Delivery estimates and service review for a small courier office</div>
-    </div>
-  </div>
-  <div class="wb-chips">
-    {estimate_chip}
-    <span class="wb-chip"><span class="dot"></span>Works offline</span>
-    <span class="wb-chip">Models loaded {LOADED_AT}</span>
-    <span class="wb-chip">Demonstration data</span>
-  </div>
-</div>
-""",
+    '<div class="wb-hero"><div class="wb-brand"><div class="wb-logo">W</div><div>'
+    f'<div class="wb-name">{APP_NAME}</div>'
+    '<div class="wb-tag">Delivery estimates and service review for a small courier office</div>'
+    "</div></div></div>"
 )
+status = ["Works offline", "Demonstration data", f"Models loaded at {LOADED_AT}"]
+if estimate_now:
+    status.insert(0, f"Current job: **{estimate_now['minutes']:.1f} min**")
+st.caption("  ·  ".join(status))
 
 tab_overview, tab_profiles, tab_image, tab_comments, tab_summary = st.tabs([
     "Delivery overview and duration estimate",
