@@ -94,97 +94,57 @@ html(
     """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 html, body, [class*="css"], .stMarkdown, button, input, textarea, select, label {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-}
-.block-container { padding-top: 1.6rem; padding-bottom: 3rem; max-width: 1200px; }
-
-/* No sidebar in this app */
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.block-container { padding-top: 2rem; padding-bottom: 4rem; max-width: 1080px; }
 [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"],
 [data-testid="collapsedControl"] { display: none !important; }
 header[data-testid="stHeader"] { background: transparent; }
-
-:root { --wb-line: rgba(128,128,128,.22); --wb-soft: rgba(128,128,128,.07);
-        --wb-accent: #EA580C; }
-
-/* Hero */
-.wb-hero { display:flex; align-items:center; justify-content:space-between; gap:1rem;
-  flex-wrap:wrap; padding: .4rem 0 1.1rem 0; }
-.wb-brand { display:flex; align-items:center; gap:.85rem; }
-.wb-logo { width:46px; height:46px; border-radius:13px; background:var(--wb-accent);
-  display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800;
-  font-size:1.35rem; box-shadow: 0 6px 18px rgba(234,88,12,.35); }
-.wb-name { font-size:1.65rem; font-weight:800; letter-spacing:-.02em; line-height:1.1; }
-.wb-tag { font-size:.92rem; opacity:.68; margin-top:.1rem; }
-
-/* Section headings */
-.wb-eyebrow { font-size:.72rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
-  color: var(--wb-accent); margin-bottom:.15rem; }
-.wb-title { font-size:1.3rem; font-weight:700; letter-spacing:-.01em; margin-bottom:.15rem; }
-.wb-lead { font-size:.93rem; opacity:.7; margin-bottom:.9rem; }
-.wb-sub { font-size:.95rem; font-weight:600; margin: .2rem 0 .1rem 0; }
-.wb-muted { font-size:.85rem; opacity:.68; }
-
-/* KPI tiles */
-.wb-kpis { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:.8rem; margin:.4rem 0 1rem 0; }
-@media (max-width: 900px) { .wb-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-.wb-kpi { border:1px solid var(--wb-line); background:var(--wb-soft); border-radius:14px;
-  padding: .9rem 1rem; }
-.wb-kpi .k { font-size:.74rem; font-weight:600; letter-spacing:.05em; text-transform:uppercase; opacity:.62; }
-.wb-kpi .v { font-size:1.55rem; font-weight:700; letter-spacing:-.02em; margin-top:.15rem;
-  font-variant-numeric: tabular-nums; }
-.wb-kpi .h { font-size:.78rem; opacity:.6; margin-top:.05rem; }
-
-/* Cards */
-.wb-card { border:1px solid var(--wb-line); background:var(--wb-soft); border-radius:16px;
-  padding: 1.15rem 1.25rem; margin-bottom:.9rem; }
-.wb-card.hl { border-color: rgba(234,88,12,.55); box-shadow: 0 8px 26px rgba(234,88,12,.10); }
-.wb-card .lbl { font-size:.74rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; opacity:.62; }
-.wb-big { font-size:3.1rem; font-weight:800; letter-spacing:-.03em; line-height:1.05;
-  font-variant-numeric: tabular-nums; margin:.2rem 0 .1rem 0; }
-.wb-big span { font-size:1.05rem; font-weight:600; opacity:.6; margin-left:.35rem; letter-spacing:0; }
-.wb-grid { display:grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap:.6rem; margin-top:.8rem; }
-@media (max-width: 900px) { .wb-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-.wb-field { border-radius:10px; background: var(--wb-soft); padding:.5rem .65rem; }
-.wb-field .k { font-size:.7rem; opacity:.6; text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
-.wb-field .v { font-size:.98rem; font-weight:600; font-variant-numeric: tabular-nums; }
-.wb-divider { height:1px; background: var(--wb-line); margin: .9rem 0; }
-.wb-text { font-size:1rem; line-height:1.55; }
-.wb-empty { text-align:center; padding: 2.2rem 1rem; }
-.wb-empty .ic { font-size:1.9rem; opacity:.55; }
-
-/* Badges */
-.wb-badge { display:inline-block; font-size:.78rem; font-weight:600; padding:.22rem .62rem;
-  border-radius:999px; border:1px solid var(--wb-line); background: var(--wb-soft); margin-right:.35rem; }
-.wb-badge.pos { color:#16A34A; background: rgba(34,197,94,.13); border-color: rgba(34,197,94,.35); }
-.wb-badge.neg { color:#DC2626; background: rgba(239,68,68,.13); border-color: rgba(239,68,68,.35); }
-.wb-badge.neu { background: rgba(148,163,184,.16); border-color: rgba(148,163,184,.4); }
-.wb-badge.warn { color:#B45309; background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.4); }
-.wb-badge.grp { color: var(--wb-accent); background: rgba(234,88,12,.10); border-color: rgba(234,88,12,.4); }
-
-.wb-summary { font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-  font-size:.88rem; line-height:1.65; white-space:pre-wrap; }
-
-/* Tabs as a clean segmented bar */
-.stTabs [data-baseweb="tab-list"] { gap:.3rem; border-bottom:1px solid var(--wb-line);
-  overflow-x:auto; }
-.stTabs [data-baseweb="tab"] { height:auto; padding:.6rem 1rem; border-radius:10px 10px 0 0;
-  font-weight:600; font-size:.93rem; }
-.stTabs [data-baseweb="tab"] p { font-size:.93rem; font-weight:600; }
-.stTabs [aria-selected="true"] { color: var(--wb-accent); }
-.stTabs [data-baseweb="tab-highlight"] { background-color: var(--wb-accent); height:3px; border-radius:3px; }
-.stTabs [data-baseweb="tab-panel"] { padding-top: 1.2rem; }
-
-/* Native bordered containers and buttons */
-[data-testid="stVerticalBlockBorderWrapper"] { border-radius:16px; }
-.stButton > button, .stDownloadButton > button { border-radius:10px; font-weight:600;
-  padding:.55rem 1rem; }
+footer { visibility: hidden; }
+:root { --wb-line: rgba(128,128,128,.20); --wb-soft: rgba(128,128,128,.06); --wb-accent: #EA580C; }
+.wb-hero { display:flex; align-items:center; gap:.8rem; margin-bottom:.15rem; }
+.wb-logo { width:40px; height:40px; border-radius:11px; background:var(--wb-accent); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.15rem; }
+.wb-name { font-size:1.45rem; font-weight:800; letter-spacing:-.02em; line-height:1.15; }
+.wb-tag { font-size:.9rem; opacity:.65; }
+.wb-title { font-size:1.2rem; font-weight:700; letter-spacing:-.01em; margin:.1rem 0 .1rem 0; }
+.wb-lead { font-size:.92rem; opacity:.65; margin-bottom:1rem; }
+.wb-label { font-size:.72rem; font-weight:600; letter-spacing:.07em; text-transform:uppercase; opacity:.55; }
+.wb-big { font-size:3rem; font-weight:800; letter-spacing:-.03em; line-height:1.05;
+  font-variant-numeric: tabular-nums; margin:.25rem 0 .2rem 0; }
+.wb-big span { font-size:1rem; font-weight:600; opacity:.55; margin-left:.35rem; letter-spacing:0; }
+.wb-note { font-size:.86rem; opacity:.65; line-height:1.5; }
+.wb-row { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.9rem; }
+.wb-tagpill { font-size:.82rem; padding:.28rem .65rem; border-radius:999px; background:var(--wb-soft);
+  border:1px solid var(--wb-line); font-variant-numeric: tabular-nums; }
+.wb-group { margin-top:1rem; padding-top:.9rem; border-top:1px solid var(--wb-line); font-size:.95rem; }
+.wb-group b { color: var(--wb-accent); }
+.wb-empty { text-align:center; padding:2.6rem 1rem; opacity:.75; }
+.wb-empty .t { font-weight:600; font-size:1rem; margin-bottom:.25rem; }
+.wb-quote { font-size:1.02rem; line-height:1.55; padding:.2rem 0 .1rem .8rem;
+  border-left:3px solid var(--wb-line); margin:.3rem 0 .8rem 0; }
+.wb-badge { display:inline-block; font-size:.8rem; font-weight:600; padding:.18rem .6rem; border-radius:999px;
+  border:1px solid var(--wb-line); background:var(--wb-soft); margin-right:.3rem; }
+.wb-badge.pos { color:#16A34A; background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.35); }
+.wb-badge.neg { color:#DC2626; background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.35); }
+.wb-badge.neu { background:rgba(148,163,184,.15); border-color:rgba(148,163,184,.4); }
+.wb-badge.warn { color:#B45309; background:rgba(245,158,11,.13); border-color:rgba(245,158,11,.4); }
+.wb-summary { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:.88rem; line-height:1.7; }
+.stTabs [data-baseweb="tab-list"] { gap:.2rem; border-bottom:1px solid var(--wb-line); overflow-x:auto; }
+.stTabs [data-baseweb="tab"] { height:auto; padding:.65rem .95rem; }
+.stTabs [data-baseweb="tab"] p { font-size:.92rem; font-weight:600; }
+.stTabs [aria-selected="true"] p { color: var(--wb-accent); }
+.stTabs [data-baseweb="tab-highlight"] { background-color: var(--wb-accent); }
+.stTabs [data-baseweb="tab-panel"] { padding-top: 1.5rem; }
+[data-testid="stVerticalBlockBorderWrapper"] { border-radius:14px; }
+[data-testid="stMetric"] { padding:.15rem 0; }
+[data-testid="stMetricLabel"] p { font-size:.78rem; opacity:.7; }
+[data-testid="stMetricValue"] { font-size:1.6rem; font-variant-numeric: tabular-nums; }
+.stButton > button, .stDownloadButton > button { border-radius:10px; font-weight:600; }
 .stButton > button[kind="primary"] { background: var(--wb-accent); border-color: var(--wb-accent); }
 [data-testid="stExpander"] details { border-radius:12px; }
-footer { visibility:hidden; }
 </style>
-""",
+"""
 )
 
 
@@ -193,15 +153,9 @@ def esc(value) -> str:
     return html_lib.escape(str(value)).replace("\n", "<br>")
 
 
-def section(eyebrow: str, title: str, lead: str = "") -> None:
+def title(text: str, lead: str = "") -> None:
     lead_html = f'<div class="wb-lead">{esc(lead)}</div>' if lead else ""
-    html(f'<div class="wb-eyebrow">{esc(eyebrow)}</div>'
-                f'<div class="wb-title">{esc(title)}</div>{lead_html}')
-
-
-def subhead(title: str, note: str = "") -> None:
-    note_html = f' <span class="wb-muted">· {esc(note)}</span>' if note else ""
-    html(f'<div class="wb-sub">{esc(title)}{note_html}</div>')
+    html(f'<div class="wb-title">{esc(text)}</div>{lead_html}')
 
 
 def show_chart(chart) -> None:
@@ -578,19 +532,24 @@ def current_form_record() -> dict:
 
 def example_label(record_id: str) -> str:
     r = EXAMPLES[EXAMPLES["record_id"] == record_id].iloc[0]
-    return (f"{record_id}  ·  {r['distance_km']:g} km  ·  {r['weight_kg']:g} kg  ·  "
-            f"traffic {int(r['traffic_index'])}  ·  {int(r['stops_count'])} stops  ·  {r['vehicle']}")
+    return (f"{record_id} — {r['distance_km']:g} km, {r['weight_kg']:g} kg, "
+            f"traffic {int(r['traffic_index'])}, {int(r['stops_count'])} stops, {r['vehicle']}")
+
+
+def group_name(group: int) -> str:
+    """Short profile name, without the averages in brackets."""
+    return group_text(group).split(" (")[0]
 
 
 # --------------------------------------------------------------------------
-# Hero
+# Header
 # --------------------------------------------------------------------------
 estimate_now = st.session_state.get("estimate")
 html(
-    '<div class="wb-hero"><div class="wb-brand"><div class="wb-logo">W</div><div>'
+    '<div class="wb-hero"><div class="wb-logo">W</div><div>'
     f'<div class="wb-name">{APP_NAME}</div>'
     '<div class="wb-tag">Delivery estimates and service review for a small courier office</div>'
-    "</div></div></div>"
+    "</div></div>"
 )
 status = ["Works offline", "Demonstration data", f"Models loaded at {LOADED_AT}"]
 if estimate_now:
@@ -609,14 +568,13 @@ tab_overview, tab_profiles, tab_image, tab_comments, tab_summary = st.tabs([
 # Tab 1 — Delivery overview and duration estimate
 # ==========================================================================
 with tab_overview:
-    section("Step 1", "Estimate a delivery",
-            "Enter a job or start from a supplied example. Inputs are checked before the model runs.")
+    title("How long will this delivery take?",
+          "Pick an example job or enter your own, then press Estimate.")
 
-    form_col, result_col = st.columns([1, 1.05], gap="large")
+    form_col, result_col = st.columns([1, 1], gap="large")
     with form_col:
         with st.container(border=True):
-            subhead("Job details")
-            st.selectbox("Start from a supplied example", EXAMPLES["record_id"].tolist(),
+            st.selectbox("Start from an example", EXAMPLES["record_id"].tolist(),
                          key="example_id", on_change=load_example_into_form,
                          format_func=example_label)
             a, b = st.columns(2)
@@ -626,13 +584,12 @@ with tab_overview:
             b.number_input("Parcel weight (kg)", step=0.1, format="%.1f", key="f_weight_kg",
                            help=f"Allowed {fmt_num(RANGES['weight_kg'][0])}–"
                                 f"{fmt_num(RANGES['weight_kg'][1])} kg")
-            a.number_input("Traffic index (1–5)", step=1, key="f_traffic_index",
+            a.number_input("Traffic (1–5)", step=1, key="f_traffic_index",
                            help="1 = light traffic, 5 = heavy traffic")
             b.number_input("Stops (0–5)", step=1, key="f_stops_count")
             st.selectbox("Vehicle", CATEGORIES["vehicle"], key="f_vehicle",
                          format_func=str.capitalize,
-                         help="Confirmed by the office worker. You can also set it from the "
-                              "Vehicle image tab.")
+                         help="You can also confirm this in the Vehicle image tab.")
             estimate_clicked = st.button("Estimate duration", type="primary",
                                          use_container_width=True)
 
@@ -650,501 +607,397 @@ with tab_overview:
     with result_col:
         errors = st.session_state.get("form_errors", [])
         estimate = st.session_state.get("estimate")
-        if errors:
-            st.error("**This job was not estimated.** Please fix:\n\n"
-                     + "\n".join(f"- {e}" for e in errors))
-        elif estimate:
-            rec = estimate["record"]
-            mae = typical_error_minutes()
-            mae_txt = (f"Typical model error on held-out test jobs: about ±{mae:.1f} min. "
-                       if mae is not None else "")
-            stale = validate_record(current_form_record())[0] != rec
-            html(
-                f"""
-<div class="wb-card hl">
-  <div class="lbl">Estimated delivery duration</div>
-  <div class="wb-big">{estimate['minutes']:.1f}<span>minutes</span></div>
-  <div class="wb-muted">{esc(mae_txt)}Estimate only — not an arrival guarantee.</div>
-  <div class="wb-grid">
-    <div class="wb-field"><div class="k">Distance</div><div class="v">{rec['distance_km']:g} km</div></div>
-    <div class="wb-field"><div class="k">Weight</div><div class="v">{rec['weight_kg']:g} kg</div></div>
-    <div class="wb-field"><div class="k">Traffic</div><div class="v">{rec['traffic_index']} / 5</div></div>
-    <div class="wb-field"><div class="k">Stops</div><div class="v">{rec['stops_count']}</div></div>
-    <div class="wb-field"><div class="k">Vehicle</div><div class="v">{esc(rec['vehicle'].capitalize())}</div></div>
-  </div>
-  <div class="wb-divider"></div>
-  <div class="lbl">Delivery profile</div>
-  <div class="wb-text" style="margin-top:.35rem"><span class="wb-badge grp">Group {estimate['group']}</span>{esc(group_text(estimate['group']))}</div>
-  <div class="wb-muted" style="margin-top:.7rem">Calculated at {estimate['time']}</div>
-</div>
-""",
-            )
-            if stale:
-                st.warning("The job details changed after this estimate. Press **Estimate "
-                           "duration** again to update it.")
-        else:
-            html(
-                """
-<div class="wb-card wb-empty">
-  <div class="ic">⏱</div>
-  <div class="wb-sub">No estimate yet</div>
-  <div class="wb-muted">Choose an example or type the job details, then press
-  <b>Estimate duration</b>.</div>
-</div>
-""",
-            )
+        with st.container(border=True):
+            if errors:
+                st.error("**Please check these values:**\n\n"
+                         + "\n".join(f"- {e}" for e in errors))
+            elif estimate:
+                rec = estimate["record"]
+                mae = typical_error_minutes()
+                error_txt = (f"Usually within about ±{mae:.0f} minutes on test jobs."
+                             if mae is not None else "")
+                html(
+                    '<div class="wb-label">Estimated duration</div>'
+                    f'<div class="wb-big">{estimate["minutes"]:.1f}<span>minutes</span></div>'
+                    f'<div class="wb-note">{esc(error_txt)} An estimate, not an arrival '
+                    "guarantee.</div>"
+                    '<div class="wb-row">'
+                    f'<span class="wb-tagpill">{rec["distance_km"]:g} km</span>'
+                    f'<span class="wb-tagpill">{rec["weight_kg"]:g} kg</span>'
+                    f'<span class="wb-tagpill">traffic {rec["traffic_index"]}</span>'
+                    f'<span class="wb-tagpill">{rec["stops_count"]} stops</span>'
+                    f'<span class="wb-tagpill">{esc(rec["vehicle"])}</span></div>'
+                    f'<div class="wb-group">Profile: <b>{esc(group_name(estimate["group"]))}</b>'
+                    f' <span class="wb-note">(group {estimate["group"]})</span></div>'
+                )
+                if validate_record(current_form_record())[0] != rec:
+                    st.info("The details changed — press **Estimate duration** to update.")
+            else:
+                html('<div class="wb-empty"><div class="t">Your estimate will appear here</div>'
+                     '<div class="wb-note">Choose an example or enter the job details, then '
+                     "press <b>Estimate duration</b>.</div></div>")
 
     st.write("")
-    section("Data overview", "Supplied delivery records",
-            "Generated classroom scenarios. Charts use the training rows; durations are in minutes.")
-    split_counts = MAIN["split"].value_counts()
-    html(
-        f"""
-<div class="wb-kpis">
-  <div class="wb-kpi"><div class="k">Records</div><div class="v">{len(MAIN):,}</div>
-    <div class="h">complete, no missing values</div></div>
-  <div class="wb-kpi"><div class="k">Fixed splits</div>
-    <div class="v">{split_counts.get('train', 0)}·{split_counts.get('validation', 0)}·{split_counts.get('test', 0)}</div>
-    <div class="h">train · validation · test</div></div>
-  <div class="wb-kpi"><div class="k">Mean duration</div><div class="v">{TRAIN[TARGET].mean():.1f} min</div>
-    <div class="h">training rows</div></div>
-  <div class="wb-kpi"><div class="k">Duration range</div>
-    <div class="v">{TRAIN[TARGET].min():.0f}–{TRAIN[TARGET].max():.0f} min</div>
-    <div class="h">training rows</div></div>
-</div>
-""",
-    )
-
-    c1, c2 = st.columns(2, gap="large")
-    with c1:
-        with st.container(border=True):
-            subhead("Mean duration by traffic index", "minutes")
+    with st.expander("Explore the delivery data"):
+        split_counts = MAIN["split"].value_counts()
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Records", f"{len(MAIN):,}")
+        m2.metric("Train · val · test", f"{split_counts.get('train', 0)} · "
+                  f"{split_counts.get('validation', 0)} · {split_counts.get('test', 0)}")
+        m3.metric("Average duration", f"{TRAIN[TARGET].mean():.0f} min")
+        m4.metric("Range", f"{TRAIN[TARGET].min():.0f}–{TRAIN[TARGET].max():.0f} min")
+        c1, c2 = st.columns(2, gap="large")
+        with c1:
+            st.markdown("**Heavier traffic means longer jobs**")
             by_traffic = (TRAIN.groupby("traffic_index")[TARGET].mean().round(1)
                           .reset_index(name="minutes"))
             show_chart(
-                alt.Chart(by_traffic).mark_bar(color=ACCENT, cornerRadiusTopLeft=6,
-                                               cornerRadiusTopRight=6, size=38)
-                .encode(x=alt.X("traffic_index:O", title="Traffic index (1 light – 5 heavy)",
+                alt.Chart(by_traffic).mark_bar(color=ACCENT, cornerRadiusTopLeft=5,
+                                               cornerRadiusTopRight=5, size=34)
+                .encode(x=alt.X("traffic_index:O", title="Traffic (1 light – 5 heavy)",
                                 axis=alt.Axis(labelAngle=0)),
-                        y=alt.Y("minutes:Q", title="Mean duration (min)"),
+                        y=alt.Y("minutes:Q", title="Average minutes"),
                         tooltip=[alt.Tooltip("traffic_index:O", title="Traffic"),
-                                 alt.Tooltip("minutes:Q", title="Mean minutes")])
-                .properties(height=260)
-            )
-    with c2:
-        with st.container(border=True):
-            subhead("Distance against duration", "one dot per training job")
+                                 alt.Tooltip("minutes:Q", title="Average minutes")])
+                .properties(height=230))
+        with c2:
+            st.markdown("**Longer trips take longer**")
             show_chart(
-                alt.Chart(TRAIN).mark_circle(size=34, opacity=0.45, color=BLUE)
+                alt.Chart(TRAIN).mark_circle(size=28, opacity=0.4, color=BLUE)
                 .encode(x=alt.X("distance_km:Q", title="Distance (km)"),
-                        y=alt.Y(f"{TARGET}:Q", title="Duration (min)"),
+                        y=alt.Y(f"{TARGET}:Q", title="Minutes"),
                         tooltip=["distance_km", "weight_kg", "traffic_index", "stops_count",
                                  "vehicle", TARGET])
-                .properties(height=260)
-            )
+                .properties(height=230))
+        st.caption("Generated classroom data · charts use the 700 training jobs.")
+        st.dataframe(MAIN.head(100), hide_index=True, use_container_width=True, height=240)
 
-    e1, e2 = st.columns(2, gap="large")
-    with e1:
-        with st.expander("Preview the supplied table"):
-            st.dataframe(MAIN.head(100), hide_index=True, use_container_width=True)
-    with e2:
-        with st.expander("Check a CSV of jobs"):
-            html(
-                '<div class="wb-muted">Required columns: <code>' + esc(", ".join(FEATURES))
-                + "</code>. Incomplete rows are rejected, not filled in.</div>",
-            )
-            upload = st.file_uploader("CSV file", type=["csv"], key="csv_upload",
-                                      label_visibility="collapsed")
-            if upload is not None:
-                try:
-                    jobs = pd.read_csv(upload)
-                except Exception as exc:  # noqa: BLE001
-                    st.error(f"The file could not be read as CSV ({type(exc).__name__}).")
-                    jobs = None
-                if jobs is not None:
-                    missing = [c for c in FEATURES if c not in jobs.columns]
-                    if missing:
-                        st.error("Missing required column(s): **" + ", ".join(missing)
-                                 + "**. No predictions were made.")
-                    elif jobs.empty:
-                        st.error("The file has no rows.")
-                    else:
-                        if len(jobs) > MAX_CSV_ROWS:
-                            st.warning(f"Only the first {MAX_CSV_ROWS} rows are checked.")
-                            jobs = jobs.head(MAX_CSV_ROWS)
-                        out = []
-                        for _, row in jobs.iterrows():
-                            clean, errs = validate_record(row.to_dict())
-                            if errs:
-                                out.append({**{f: row.get(f) for f in FEATURES},
-                                            "estimate (min)": None, "group": None,
-                                            "status": "rejected: " + " ".join(errs)})
-                            else:
-                                minutes, group = predict_record(clean)
-                                out.append({**clean, "estimate (min)": round(minutes, 1),
-                                            "group": group, "status": "ok"})
-                        result = pd.DataFrame(out)
-                        ok = int((result["status"] == "ok").sum())
-                        st.success(f"{ok} of {len(result)} rows estimated.")
-                        st.dataframe(result, hide_index=True, use_container_width=True)
+    with st.expander("Check a CSV file of jobs"):
+        st.caption("Needs the columns " + ", ".join(FEATURES)
+                   + ". Rows with missing or out-of-range values are rejected, not filled in.")
+        upload = st.file_uploader("CSV file", type=["csv"], key="csv_upload",
+                                  label_visibility="collapsed")
+        if upload is not None:
+            try:
+                jobs = pd.read_csv(upload)
+            except Exception as exc:  # noqa: BLE001
+                st.error(f"The file could not be read as CSV ({type(exc).__name__}).")
+                jobs = None
+            if jobs is not None:
+                missing = [c for c in FEATURES if c not in jobs.columns]
+                if missing:
+                    st.error("Missing column(s): **" + ", ".join(missing)
+                             + "**. No estimates were made.")
+                elif jobs.empty:
+                    st.error("The file has no rows.")
+                else:
+                    if len(jobs) > MAX_CSV_ROWS:
+                        st.warning(f"Only the first {MAX_CSV_ROWS} rows are checked.")
+                        jobs = jobs.head(MAX_CSV_ROWS)
+                    out = []
+                    for _, row in jobs.iterrows():
+                        clean, errs = validate_record(row.to_dict())
+                        if errs:
+                            out.append({**{f: row.get(f) for f in FEATURES},
+                                        "estimate (min)": None, "group": None,
+                                        "status": "rejected: " + " ".join(errs)})
+                        else:
+                            minutes, group = predict_record(clean)
+                            out.append({**clean, "estimate (min)": round(minutes, 1),
+                                        "group": group, "status": "ok"})
+                    result = pd.DataFrame(out)
+                    ok = int((result["status"] == "ok").sum())
+                    st.success(f"{ok} of {len(result)} rows estimated.")
+                    st.dataframe(result, hide_index=True, use_container_width=True)
 
 # ==========================================================================
 # Tab 2 — Delivery profiles (KMeans, 3 groups)
 # ==========================================================================
 with tab_profiles:
-    section("Step 2", "Delivery profiles",
-            "KMeans grouped the training jobs into three profiles using distance, weight, "
-            "traffic and stops.")
+    title("What kind of job is it?",
+          "Jobs are grouped into three profiles by distance, weight, traffic and stops.")
     rows, profile_table = group_profiles()
     estimate = st.session_state.get("estimate")
+    current = estimate["group"] if estimate else None
 
+    cols = st.columns(len(profile_table), gap="medium")
+    for col, (g, r) in zip(cols, profile_table.iterrows()):
+        with col:
+            with st.container(border=True):
+                marker = "  ← this job" if current == g else ""
+                st.markdown(f"**{group_name(g)}**{marker}")
+                st.caption(f"Group {g} · {int(r['jobs'])} jobs")
+                st.markdown(f"{r['distance_km']:.0f} km · {r['weight_kg']:.1f} kg  \n"
+                            f"traffic {r['traffic_index']:.1f} · {r['stops_count']:.1f} stops")
+    if current is None:
+        st.caption("Estimate a job in the first tab to see which profile it belongs to.")
+
+    st.write("")
+    plot = rows.assign(profile=rows["group"].map(lambda g: f"{g}: {group_name(g)}"))
+    domain = [f"{g}: {group_name(g)}" for g in sorted(rows["group"].unique())]
+    base = (alt.Chart(plot).mark_circle(size=34, opacity=0.55)
+            .encode(x=alt.X("distance_km:Q", title="Distance (km)"),
+                    y=alt.Y("weight_kg:Q", title="Parcel weight (kg)"),
+                    color=alt.Color("profile:N", title=None,
+                                    scale=alt.Scale(domain=domain,
+                                                    range=GROUP_COLOURS[:len(domain)]),
+                                    legend=alt.Legend(orient="top")),
+                    tooltip=["profile", "distance_km", "weight_kg", "traffic_index",
+                             "stops_count"])
+            .properties(height=330))
     if estimate:
-        html(
-            f'<div class="wb-card hl"><div class="lbl">Current job</div>'
-            f'<div class="wb-text" style="margin-top:.35rem"><span class="wb-badge grp">'
-            f'Group {estimate["group"]}</span>{esc(group_text(estimate["group"]))}</div></div>',
-        )
+        job = pd.DataFrame([{"distance_km": estimate["record"]["distance_km"],
+                             "weight_kg": estimate["record"]["weight_kg"],
+                             "label": "This job"}])
+        marker = (alt.Chart(job).mark_point(shape="diamond", size=300, filled=True, color=ACCENT,
+                                            stroke="white", strokeWidth=1.5)
+                  .encode(x="distance_km:Q", y="weight_kg:Q", tooltip=["label"]))
+        show_chart(base + marker)
+        st.caption("The orange diamond is your job. Only two of the four features are shown, "
+                   "so groups overlap.")
     else:
-        st.info("Estimate a job in **Delivery overview and duration estimate** to see which profile it belongs to.")
+        show_chart(base)
+        st.caption("Only two of the four features are shown, so groups overlap.")
 
-    cards = []
-    for g, r in profile_table.iterrows():
-        name = esc(group_text(g).split(" (")[0])
-        colour = GROUP_COLOURS[int(g) % len(GROUP_COLOURS)]
-        cards.append(
-            f'<div class="wb-kpi" style="border-top:4px solid {colour}">'
-            f'<div class="k">Group {g} · {int(r["jobs"])} jobs</div>'
-            f'<div class="v" style="font-size:1.08rem;margin-top:.3rem">{name}</div>'
-            f'<div class="h" style="margin-top:.45rem">{r["distance_km"]:.1f} km · '
-            f'{r["weight_kg"]:.1f} kg · traffic {r["traffic_index"]:.1f} · '
-            f'{r["stops_count"]:.1f} stops</div></div>')
-    html('<div class="wb-kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">'
-                + "".join(cards) + "</div>")
-
-    plot_col, table_col = st.columns([1.5, 1], gap="large")
-    with plot_col:
-        with st.container(border=True):
-            subhead("Groups by distance and parcel weight", "training jobs")
-            plot = rows.assign(group_name=rows["group"].map(lambda g: f"Group {g}"))
-            domain = [f"Group {g}" for g in sorted(rows["group"].unique())]
-            base = (
-                alt.Chart(plot).mark_circle(size=40, opacity=0.6)
-                .encode(x=alt.X("distance_km:Q", title="Distance (km)"),
-                        y=alt.Y("weight_kg:Q", title="Parcel weight (kg)"),
-                        color=alt.Color("group_name:N", title=None,
-                                        scale=alt.Scale(domain=domain,
-                                                        range=GROUP_COLOURS[:len(domain)]),
-                                        legend=alt.Legend(orient="top")),
-                        tooltip=["group_name", "distance_km", "weight_kg", "traffic_index",
-                                 "stops_count"])
-                .properties(height=330)
-            )
-            if estimate:
-                job = pd.DataFrame([{"distance_km": estimate["record"]["distance_km"],
-                                     "weight_kg": estimate["record"]["weight_kg"],
-                                     "label": "This job"}])
-                marker = (alt.Chart(job).mark_point(shape="diamond", size=320, filled=True,
-                                                    color=ACCENT, stroke="white", strokeWidth=1.5)
-                          .encode(x="distance_km:Q", y="weight_kg:Q", tooltip=["label"]))
-                show_chart(base + marker)
-                st.caption("◆ The orange diamond is the current job.")
-            else:
-                show_chart(base)
-    with table_col:
-        with st.container(border=True):
-            subhead("Group averages", "original units")
-            shown = profile_table.drop(columns=["description"]).rename(columns={
-                "distance_km": "km", "weight_kg": "kg", "traffic_index": "traffic",
-                "stops_count": "stops"})
-            shown.index = [f"Group {g}" for g in shown.index]
-            st.dataframe(shown, use_container_width=True)
-            html(
-                '<div class="wb-muted">The chart shows two of the four features, so some '
-                "overlap is expected. Group numbers are labels, not a ranking. Grouping similar "
-                "jobs is not route optimisation and does not prove a cause.</div>",
-            )
+    with st.expander("About these profiles"):
+        st.markdown("- Profiles come from KMeans (k = 3) on the scaled training jobs; names were "
+                    "chosen from the averages in original units.\n"
+                    "- Group numbers are labels, not a ranking.\n"
+                    "- Grouping similar jobs is not route optimisation and does not prove a cause.")
+        shown = profile_table.drop(columns=["description"]).rename(columns={
+            "distance_km": "km", "weight_kg": "kg", "traffic_index": "traffic",
+            "stops_count": "stops"})
+        shown.index = [f"Group {g}" for g in shown.index]
+        st.dataframe(shown, use_container_width=True)
 
 # ==========================================================================
 # Tab 3 — Vehicle image
 # ==========================================================================
 with tab_image:
-    section("Step 3", "Check the vehicle",
-            "The classifier suggests car or truck; the office worker confirms the category.")
+    title("Is it a car or a truck?",
+          "The model makes a suggestion. You confirm the vehicle before the estimate.")
 
-    opt1, opt2 = st.columns([1.2, 1], gap="large")
-    source = opt1.radio("Image source", ["Supplied sample", "Upload PNG or JPG"],
-                        horizontal=True, key="img_source")
-    image_model_name = opt2.selectbox("Classifier", list(IMAGE_MODELS), index=0, key="img_model")
-
-    image, problem = None, None
-    if source == "Supplied sample":
-        sample_files = sorted(p.name for p in SAMPLES.glob("*.png"))
-        if not sample_files:
-            problem = "No sample images were found in sample_images/."
-        else:
-            choice = opt1.selectbox("Sample image", sample_files, key="img_sample")
-            image = Image.open(SAMPLES / choice)
-    else:
-        upload = opt1.file_uploader("Image file", type=["png", "jpg", "jpeg"], key="img_upload")
-        if upload is not None:
-            if upload.size > MAX_UPLOAD_MB * 1024 * 1024:
-                problem = f"The file is larger than {MAX_UPLOAD_MB} MB."
+    left, right = st.columns([1, 1], gap="large")
+    image, problem, suggestion, scores = None, None, None, None
+    with left:
+        with st.container(border=True):
+            source = st.radio("Image", ["Sample image", "Upload my own"], horizontal=True,
+                              key="img_source", label_visibility="collapsed")
+            if source == "Sample image":
+                sample_files = sorted(p.name for p in SAMPLES.glob("*.png"))
+                if not sample_files:
+                    problem = "No sample images were found in sample_images/."
+                else:
+                    choice = st.selectbox("Sample", sample_files, key="img_sample",
+                                          label_visibility="collapsed")
+                    image = Image.open(SAMPLES / choice)
             else:
-                try:
-                    image = Image.open(io.BytesIO(upload.getvalue()))
-                    image.load()
-                except (UnidentifiedImageError, OSError):
-                    problem = "The file could not be read as a PNG or JPG image."
-
-    if problem:
-        st.error(problem)
-
-    if image is not None:
-        batch, small = prepare_image(image)
-        model, load_error = load_image_model(IMAGE_MODELS[image_model_name])
-        left, right = st.columns([1, 1.15], gap="large")
-        with left:
-            with st.container(border=True):
-                subhead("Input")
+                upload = st.file_uploader("PNG or JPG, up to 5 MB", type=["png", "jpg", "jpeg"],
+                                          key="img_upload")
+                if upload is not None:
+                    if upload.size > MAX_UPLOAD_MB * 1024 * 1024:
+                        problem = f"The file is larger than {MAX_UPLOAD_MB} MB."
+                    else:
+                        try:
+                            image = Image.open(io.BytesIO(upload.getvalue()))
+                            image.load()
+                        except (UnidentifiedImageError, OSError):
+                            problem = "That file could not be read as a PNG or JPG image."
+            if problem:
+                st.error(problem)
+            if image is not None:
+                batch, small = prepare_image(image)
                 p1, p2 = st.columns(2)
-                p1.image(enlarge(image.convert("RGB"), 220), caption="Original",
+                p1.image(enlarge(image.convert("RGB"), 220), caption="Your image",
                          use_container_width=True)
-                p2.image(enlarge(small, 220),
-                         caption=f"Model input · {IMAGE_SHAPE[0]}×{IMAGE_SHAPE[1]} RGB",
+                p2.image(enlarge(small, 220), caption="What the model sees (32×32)",
                          use_container_width=True)
-                html(
-                    f'<div class="wb-muted">Shape (1, {IMAGE_SHAPE[0]}, {IMAGE_SHAPE[1]}, '
-                    f'{IMAGE_SHAPE[2]}), pixel values 0–255 (the model rescales once). '
-                    f'Class order: {esc(", ".join(IMAGE_CLASSES))}.</div>',
-                )
-        with right:
-            suggestion = None
-            if load_error:
-                st.error("The image classifier could not be loaded, so no suggestion is shown. "
-                         "You can still choose the vehicle below.\n\n" + load_error)
-            else:
-                scores = model.predict(batch, verbose=0)[0]
-                best = int(np.argmax(scores))
-                suggestion = IMAGE_CLASSES[best]
-                html(
-                    f'<div class="wb-card hl"><div class="lbl">Model suggestion</div>'
-                    f'<div class="wb-big">{esc(suggestion.capitalize())}'
-                    f'<span>score {scores[best]:.2f}</span></div>'
-                    f'<div class="wb-muted">A score is not a calibrated probability, and the model '
-                    "cannot recognise objects outside its two classes.</div></div>",
-                )
-                score_frame = pd.DataFrame({"class": [c.capitalize() for c in IMAGE_CLASSES],
-                                            "score": [float(s) for s in scores]})
-                show_chart(
-                    alt.Chart(score_frame).mark_bar(cornerRadiusEnd=6, size=22)
-                    .encode(x=alt.X("score:Q", title="Model score",
-                                    scale=alt.Scale(domain=[0, 1])),
-                            y=alt.Y("class:N", title=None, sort=None),
-                            color=alt.Color("class:N", legend=None,
-                                            scale=alt.Scale(range=[BLUE, ACCENT])),
-                            tooltip=["class", alt.Tooltip("score:Q", format=".2f")])
-                    .properties(height=110)
-                )
+            elif not problem:
+                st.caption("Upload a PNG or JPG image, or switch to a sample.")
 
-            with st.container(border=True):
-                options = CATEGORIES["vehicle"]
-                default = options.index(suggestion) if suggestion in options else 0
-                confirmed = st.radio("Confirm the vehicle category", options, index=default,
-                                     key="img_confirm", horizontal=True,
-                                     format_func=str.capitalize)
+    with right:
+        with st.container(border=True):
+            image_model_name = st.selectbox("Model", list(IMAGE_MODELS), index=0,
+                                            key="img_model")
+            if image is not None:
+                model, load_error = load_image_model(IMAGE_MODELS[image_model_name])
+                if load_error:
+                    st.error("The image model could not be loaded, so there is no suggestion. "
+                             "You can still choose the vehicle below.")
+                    st.caption(load_error)
+                else:
+                    scores = model.predict(batch, verbose=0)[0]
+                    best = int(np.argmax(scores))
+                    suggestion = IMAGE_CLASSES[best]
+                    html('<div class="wb-label">Suggestion</div>'
+                         f'<div class="wb-big">{esc(suggestion.capitalize())}'
+                         f'<span>score {scores[best]:.2f}</span></div>')
+                    st.progress(float(scores[best]))
+            options = CATEGORIES["vehicle"]
+            default = options.index(suggestion) if suggestion in options else 0
+            confirmed = st.radio("Confirm the vehicle", options, index=default,
+                                 key="img_confirm", horizontal=True, format_func=str.capitalize)
 
-                def use_confirmed() -> None:
-                    st.session_state["f_vehicle"] = st.session_state["img_confirm"]
+            def use_confirmed() -> None:
+                st.session_state["f_vehicle"] = st.session_state["img_confirm"]
 
-                st.button("Use this vehicle in the estimate", on_click=use_confirmed,
-                          type="primary", use_container_width=True)
-                if st.session_state.get("f_vehicle") == confirmed:
-                    st.caption(f"The job form is set to **{confirmed}**. Press Estimate duration "
-                               "in the first tab to update the estimate.")
+            st.button("Use for the estimate", on_click=use_confirmed, type="primary",
+                      use_container_width=True)
+            if st.session_state.get("f_vehicle") == confirmed:
+                st.caption(f"The job form is set to **{confirmed}**.")
 
+    with st.expander("About the image models"):
         metrics = METADATA.get("image_test_metrics", {})
-        if metrics:
-            final = metrics.get("extension_transfer_augmentation", {})
-            small_cnn = metrics.get("small_cnn_required", {})
-            st.caption(
-                f"Test accuracy on the 200 supplied test images: final model "
-                f"{final.get('accuracy', float('nan')):.1%} · small CNN "
-                f"{small_cnn.get('accuracy', float('nan')):.1%}."
-            )
-    elif not problem and source != "Supplied sample":
-        st.info("Upload a PNG or JPG image (up to 5 MB), or switch to a supplied sample.")
-
-    html(
-        '<div class="wb-muted" style="margin-top:.6rem">The models were trained on small, '
-        "low-resolution CIFAR-10 images. They do not identify owners, registration numbers, "
-        "damage or road conditions and can be wrong on real photos, so the worker always "
-        "confirms the vehicle.</div>",
-    )
+        final = metrics.get("extension_transfer_augmentation", {})
+        small_cnn = metrics.get("small_cnn_required", {})
+        st.markdown(
+            f"- **Final model** (MobileNetV2 transfer learning + augmentation): "
+            f"{final.get('accuracy', float('nan')):.1%} on 200 test images.\n"
+            f"- **Required small CNN**: {small_cnn.get('accuracy', float('nan')):.1%} on the same "
+            "images.\n"
+            f"- Input: RGB, {IMAGE_SHAPE[0]}×{IMAGE_SHAPE[1]}, batch of 1, pixel values 0–255 (the "
+            f"model rescales once). Class order: {', '.join(IMAGE_CLASSES)}.\n"
+            "- Trained on small CIFAR-10 images, so it can be wrong on real photos and cannot "
+            "recognise other objects. A score is not a calibrated probability.")
 
 # ==========================================================================
 # Tab 4 — Customer comments (VADER sentiment + keyword topics)
 # ==========================================================================
 with tab_comments:
-    section("Step 4", "Customer comments",
-            "VADER scores the tone of each comment; supplied keyword rules give its topic.")
+    title("What are customers saying?",
+          "Each comment gets a tone (sentiment) and a subject (topic).")
     analyser, nlp_error = load_sentiment_analyser()
     if nlp_error:
-        st.error("The offline sentiment lexicon could not be loaded from nltk_data/.\n\n"
-                 + nlp_error)
+        st.error("The offline sentiment lexicon could not be loaded from nltk_data/.")
+        st.caption(nlp_error)
     else:
         table = scored_feedback(True)
+        counts, topics, n_scored, n_empty = comment_totals(table)
 
-        def result_card(text: str, sentiment: str, compound, topic: str, keyword: str,
-                        reference: str | None = None) -> None:
-            ref = (f'<div class="wb-field"><div class="k">Reference label</div>'
-                   f'<div class="v">{sentiment_pill(reference)}</div></div>') if reference else ""
-            comp = f"{compound:+.3f}" if compound is not None else "—"
-            kw = f"“{esc(keyword)}”" if keyword else "none"
-            shown_text = esc(text) if str(text).strip() else "<i>(blank comment)</i>"
-            cols = 4 if reference else 3
-            html(
-                f"""
-<div class="wb-card hl">
-  <div class="lbl">Comment</div>
-  <div class="wb-text" style="margin-top:.3rem">{shown_text}</div>
-  <div class="wb-grid" style="grid-template-columns:repeat({cols},minmax(0,1fr))">
-    <div class="wb-field"><div class="k">Sentiment</div><div class="v">{sentiment_pill(sentiment)}</div></div>
-    <div class="wb-field"><div class="k">Compound</div><div class="v">{comp}</div></div>
-    <div class="wb-field"><div class="k">Topic · keyword</div><div class="v">{esc(topic)} · {kw}</div></div>
-    {ref}
-  </div>
-</div>
-""",
-            )
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Comments", n_scored)
+        m2.metric("Positive", counts["positive"])
+        m3.metric("Neutral", counts["neutral"])
+        m4.metric("Negative", counts["negative"])
 
+        def result_view(text: str, sentiment: str, compound, topic: str, keyword: str) -> None:
+            shown = esc(text) if str(text).strip() else "<i>(blank)</i>"
+            kw = f" — matched “{esc(keyword)}”" if keyword else ""
+            comp = f"{compound:+.2f}" if compound is not None else "—"
+            html(f'<div class="wb-quote">{shown}</div>'
+                 f"{sentiment_pill(sentiment)}"
+                 f'<span class="wb-note">score {comp} · topic <b>{esc(topic)}</b>{kw}</span>')
+
+        st.write("")
         pick_col, write_col = st.columns(2, gap="large")
         with pick_col:
             with st.container(border=True):
-                subhead("Try a supplied comment")
+                st.markdown("**Browse a customer comment**")
                 options = table["comment_id"].tolist()
                 picked = st.selectbox(
-                    "Supplied comment", options, key="comment_pick",
-                    label_visibility="collapsed",
-                    format_func=lambda cid: f"{cid}  ·  "
-                    + str(table.loc[table['comment_id'] == cid, 'text'].iloc[0])[:72])
+                    "Comment", options, key="comment_pick", label_visibility="collapsed",
+                    format_func=lambda cid: str(
+                        table.loc[table["comment_id"] == cid, "text"].iloc[0])[:70])
                 row = table[table["comment_id"] == picked].iloc[0]
-            result_card(row["text"], row["predicted_sentiment"], row["compound"], row["topic"],
-                        row["matched_keyword"], reference=row["sentiment_label"])
+                result_view(row["text"], row["predicted_sentiment"], row["compound"],
+                            row["topic"], row["matched_keyword"])
+                st.caption(f"Reference label: {row['sentiment_label']}")
 
         with write_col:
             with st.container(border=True):
-                subhead("Write a comment", f"optional · English · up to {MAX_COMMENT_CHARS} characters")
+                st.markdown("**Try your own comment**")
                 typed = st.text_area("Comment", key="comment_text", max_chars=MAX_COMMENT_CHARS,
-                                     height=96, label_visibility="collapsed",
-                                     placeholder="e.g. The parcel arrived late but the staff were kind.")
+                                     height=90, label_visibility="collapsed",
+                                     placeholder="e.g. The parcel arrived late but the staff "
+                                                 "were kind.")
                 b1, b2 = st.columns([2, 1])
-                analyse = b1.button("Analyse comment", type="primary", use_container_width=True)
+                analyse = b1.button("Analyse", type="primary", use_container_width=True)
                 clear = b2.button("Clear", use_container_width=True,
                                   disabled=not st.session_state["session_comments"])
-            if analyse:
-                sentiment, compound = score_comment(analyser, typed)
-                topic, keyword = find_topic(typed)
-                st.session_state["session_comments"].append(
-                    {"text": typed, "predicted_sentiment": sentiment, "topic": topic})
-                st.session_state["last_typed"] = (typed, sentiment, compound, topic, keyword)
-            if clear:
-                st.session_state["session_comments"] = []
-                st.session_state.pop("last_typed", None)
-                st.rerun()
-            last = st.session_state.get("last_typed")
-            if last:
-                result_card(*last)
-                if last[1] == "empty":
-                    st.warning("Blank comment: treated as **empty** and excluded from the "
-                               "sentiment totals.")
+                if analyse:
+                    sentiment, compound = score_comment(analyser, typed)
+                    topic, keyword = find_topic(typed)
+                    st.session_state["session_comments"].append(
+                        {"text": typed, "predicted_sentiment": sentiment, "topic": topic})
+                    st.session_state["last_typed"] = (typed, sentiment, compound, topic, keyword)
+                    st.rerun()
+                if clear:
+                    st.session_state["session_comments"] = []
+                    st.session_state.pop("last_typed", None)
+                    st.rerun()
+                last = st.session_state.get("last_typed")
+                if last:
+                    if last[1] == "empty":
+                        st.warning("That comment was blank, so it is not counted.")
+                    else:
+                        result_view(*last)
+                st.caption(f"English · up to {MAX_COMMENT_CHARS} characters · "
+                           "your comments are added to the totals.")
 
-        counts, topics, n_scored, n_empty = comment_totals(table)
-        extra = len(st.session_state["session_comments"])
-        html(
-            f"""
-<div class="wb-kpis">
-  <div class="wb-kpi"><div class="k">Comments scored</div><div class="v">{n_scored}</div>
-    <div class="h">{len(table)} supplied · {extra} added · {n_empty} empty excluded</div></div>
-  <div class="wb-kpi" style="border-top:4px solid {GREEN}"><div class="k">Positive</div><div class="v">{counts['positive']}</div></div>
-  <div class="wb-kpi" style="border-top:4px solid {SLATE}"><div class="k">Neutral</div><div class="v">{counts['neutral']}</div></div>
-  <div class="wb-kpi" style="border-top:4px solid {RED}"><div class="k">Negative</div><div class="v">{counts['negative']}</div></div>
-</div>
-""",
-        )
-
+        st.write("")
         ch1, ch2 = st.columns(2, gap="large")
         with ch1:
-            with st.container(border=True):
-                subhead("Sentiment counts")
-                sent_df = pd.DataFrame({"sentiment": SENTIMENT_ORDER,
-                                        "comments": [counts[s] for s in SENTIMENT_ORDER]})
-                show_chart(
-                    alt.Chart(sent_df).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6,
-                                                size=46)
-                    .encode(x=alt.X("sentiment:N", sort=SENTIMENT_ORDER, title=None,
-                                    axis=alt.Axis(labelAngle=0)),
-                            y=alt.Y("comments:Q", title="Comments"),
-                            color=alt.Color("sentiment:N", legend=None,
-                                            scale=alt.Scale(domain=SENTIMENT_ORDER,
-                                                            range=[GREEN, SLATE, RED])),
-                            tooltip=["sentiment", "comments"])
-                    .properties(height=240)
-                )
+            st.markdown("**Tone**")
+            sent_df = pd.DataFrame({"sentiment": SENTIMENT_ORDER,
+                                    "comments": [counts[s] for s in SENTIMENT_ORDER]})
+            show_chart(
+                alt.Chart(sent_df).mark_bar(cornerRadiusTopLeft=5, cornerRadiusTopRight=5,
+                                            size=40)
+                .encode(x=alt.X("sentiment:N", sort=SENTIMENT_ORDER, title=None,
+                                axis=alt.Axis(labelAngle=0)),
+                        y=alt.Y("comments:Q", title="Comments"),
+                        color=alt.Color("sentiment:N", legend=None,
+                                        scale=alt.Scale(domain=SENTIMENT_ORDER,
+                                                        range=[GREEN, SLATE, RED])),
+                        tooltip=["sentiment", "comments"])
+                .properties(height=210))
         with ch2:
-            with st.container(border=True):
-                subhead("Topic counts", "first keyword match, in file order")
-                order = list(TOPIC_RULES) + ["other"]
-                topic_df = pd.DataFrame({"topic": order,
-                                         "comments": [topics.get(t, 0) for t in order]})
-                show_chart(
-                    alt.Chart(topic_df).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6,
-                                                 size=46, color=BLUE)
-                    .encode(x=alt.X("topic:N", sort=order, title=None,
-                                    axis=alt.Axis(labelAngle=0)),
-                            y=alt.Y("comments:Q", title="Comments"),
-                            tooltip=["topic", "comments"])
-                    .properties(height=240)
-                )
+            st.markdown("**Topics**")
+            order = list(TOPIC_RULES) + ["other"]
+            topic_df = pd.DataFrame({"topic": order,
+                                     "comments": [topics.get(t, 0) for t in order]})
+            show_chart(
+                alt.Chart(topic_df).mark_bar(cornerRadiusTopLeft=5, cornerRadiusTopRight=5,
+                                             size=40, color=BLUE)
+                .encode(x=alt.X("topic:N", sort=order, title=None, axis=alt.Axis(labelAngle=0)),
+                        y=alt.Y("comments:Q", title="Comments"),
+                        tooltip=["topic", "comments"])
+                .properties(height=210))
+        if n_empty:
+            st.caption(f"{n_empty} blank comment(s) excluded from the totals.")
 
-        x1, x2 = st.columns(2, gap="large")
-        with x1:
-            with st.expander("Agreement with the supplied reference labels"):
-                from sklearn.metrics import accuracy_score, f1_score
+        with st.expander("How well does it match the reference labels?"):
+            from sklearn.metrics import accuracy_score, f1_score
 
-                scored = table[table["predicted_sentiment"] != "empty"]
-                acc = accuracy_score(scored["sentiment_label"], scored["predicted_sentiment"])
-                f1 = f1_score(scored["sentiment_label"], scored["predicted_sentiment"],
-                              average="macro", labels=SENTIMENT_ORDER, zero_division=0)
-                st.markdown(f"**Accuracy** {acc:.1%}  ·  **Macro F1** {f1:.3f}")
-                matrix = pd.crosstab(scored["sentiment_label"], scored["predicted_sentiment"],
-                                     rownames=["reference"], colnames=["predicted"]) \
-                    .reindex(index=SENTIMENT_ORDER, columns=SENTIMENT_ORDER, fill_value=0)
-                st.dataframe(matrix, use_container_width=True)
-                wrong = scored[scored["sentiment_label"] != scored["predicted_sentiment"]]
-                if not wrong.empty:
-                    st.markdown("**Disagreements**")
-                    st.dataframe(wrong[["comment_id", "text", "sentiment_label",
-                                        "predicted_sentiment", "compound"]],
-                                 hide_index=True, use_container_width=True)
-        with x2:
-            with st.expander("All supplied comments"):
-                st.dataframe(table[["comment_id", "text", "sentiment_label",
-                                    "predicted_sentiment", "compound", "topic",
-                                    "matched_keyword"]],
-                             hide_index=True, use_container_width=True)
+            scored = table[table["predicted_sentiment"] != "empty"]
+            acc = accuracy_score(scored["sentiment_label"], scored["predicted_sentiment"])
+            f1 = f1_score(scored["sentiment_label"], scored["predicted_sentiment"],
+                          average="macro", labels=SENTIMENT_ORDER, zero_division=0)
+            e1, e2 = st.columns(2)
+            e1.metric("Accuracy", f"{acc:.1%}")
+            e2.metric("Macro F1", f"{f1:.3f}")
+            matrix = pd.crosstab(scored["sentiment_label"], scored["predicted_sentiment"],
+                                 rownames=["reference"], colnames=["predicted"]) \
+                .reindex(index=SENTIMENT_ORDER, columns=SENTIMENT_ORDER, fill_value=0)
+            st.dataframe(matrix, use_container_width=True)
+            wrong = scored[scored["sentiment_label"] != scored["predicted_sentiment"]]
+            if not wrong.empty:
+                st.markdown("**Where it disagrees**")
+                st.dataframe(wrong[["text", "sentiment_label", "predicted_sentiment",
+                                    "compound"]], hide_index=True, use_container_width=True)
+            st.caption("VADER reads tone from words; it can miss sarcasm, negation and mixed "
+                       "opinions. Topics use the first keyword match, in file order. English only.")
 
-        html(
-            '<div class="wb-muted">Sentiment describes tone and topics describe subject matter; '
-            "neither is full understanding. Negation, sarcasm and mixed opinions can be misread. "
-            "English only — Urdu and Roman Urdu are outside this baseline.</div>",
-        )
+        with st.expander("All customer comments"):
+            st.dataframe(table[["comment_id", "text", "sentiment_label", "predicted_sentiment",
+                                "compound", "topic", "matched_keyword"]],
+                         hide_index=True, use_container_width=True)
 
 # ==========================================================================
 # Tab 5 — Service summary (offline by default, optional Groq Free Plan)
 # ==========================================================================
 with tab_summary:
-    section("Step 5", "Service summary",
-            "A short summary built from the calculated results. Works without any API key.")
+    title("Service summary", "A short summary of the results — no API key needed.")
 
     analyser_ok = load_sentiment_analyser()[0] is not None
     if analyser_ok:
@@ -1155,20 +1008,18 @@ with tab_summary:
     snapshot = build_snapshot(estimate, counts, topics, n_scored)
     offline_text = offline_summary(snapshot)
 
-    if estimate is None:
-        st.info("No duration estimate yet — the summary uses the comments only. Estimate a job "
-                "in **Delivery overview and duration estimate** to include it.")
-
     mode = st.radio("Summary type", ["Offline summary", "AI summary · Groq Free Plan"],
-                    horizontal=True, key="summary_mode",
-                    help="The offline summary needs no API key and is always available.")
+                    horizontal=True, key="summary_mode", label_visibility="collapsed")
 
     def show_offline() -> None:
-        html(f'<div class="wb-card"><div class="lbl" style="margin-bottom:.5rem">Offline '
-                    f'summary · fixed template</div><div class="wb-summary">{esc(offline_text).replace("  ", "&nbsp;&nbsp;")}'
-                    "</div></div>")
-        st.download_button("Download summary (.txt)", offline_text,
+        with st.container(border=True):
+            body = esc(offline_text).replace("  ", "&nbsp;&nbsp;")
+            html(f'<div class="wb-summary">{body}</div>')
+        st.download_button("Download as text", offline_text,
                            file_name="waybill_offline_summary.txt", mime="text/plain")
+
+    if estimate is None:
+        st.caption("Tip: estimate a job in the first tab to include it in the summary.")
 
     if mode == "Offline summary":
         show_offline()
@@ -1177,24 +1028,17 @@ with tab_summary:
         model_id = get_secret("GROQ_MODEL", "openai/gpt-oss-20b")
         snap_key = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()
 
-        with st.container(border=True):
-            i1, i2 = st.columns([1.6, 1], gap="large")
-            with i1:
-                html(
-                    '<div class="wb-muted">One request is sent only when you press the button. '
-                    "It contains calculated totals — no comment text, images or files. The model "
-                    "is asked for one observation, two actions and one limitation in under 120 "
-                    f'words. Model: <code>{esc(model_id)}</code>. Key: '
-                    f'{"set" if api_key else "<b>not set</b>"}.</div>',
-                )
-                simulate_failure = st.toggle(
-                    "Test mode: simulate an API failure", value=False, key="simulate_failure",
-                    help="Forces the request to fail so you can check the offline fallback.")
-            with i2:
-                generate = st.button("Generate AI summary", type="primary",
-                                     use_container_width=True)
-            with st.expander("What will be sent"):
-                st.json(snapshot)
+        g1, g2 = st.columns([2, 1], gap="large")
+        with g1:
+            st.caption("Sends one request with the calculated totals only — no comment text, "
+                       "images or files. Asks for one observation, two actions and one "
+                       f"limitation in under 120 words. Model: {model_id}. Key: "
+                       f"{'set' if api_key else 'not set'}.")
+            simulate_failure = st.toggle("Test mode: simulate an API failure", value=False,
+                                         key="simulate_failure")
+        with g2:
+            generate = st.button("Generate AI summary", type="primary",
+                                 use_container_width=True)
 
         if generate:
             try:
@@ -1217,29 +1061,25 @@ with tab_summary:
         ai_error = st.session_state.get("ai_error")
         ai = st.session_state.get("ai_summary")
         if ai_error:
-            st.warning(f"**AI summary unavailable.** {ai_error} Everything else still works — "
-                       "the offline summary is shown below.")
+            st.warning(f"**AI summary unavailable.** {ai_error} Here is the offline summary "
+                       "instead — everything else still works.")
             show_offline()
         elif ai:
-            words = len(ai["text"].split())
             if ai["key"] != snap_key:
-                st.warning("The results changed after this AI summary was made. Press "
-                           "**Generate AI summary** to update it.")
+                st.info("The results changed after this summary was made. Generate again to "
+                        "update it.")
             with st.container(border=True):
-                html(f'<div class="lbl" style="font-size:.74rem;font-weight:600;'
-                            f'letter-spacing:.06em;text-transform:uppercase;opacity:.62">'
-                            f"AI-generated · Groq · {ai['time']} · {words} words</div>")
+                st.caption(f"AI-generated · Groq · {ai['time']} · {len(ai['text'].split())} words")
                 st.markdown(ai["text"])
-            st.caption("Generated text can contain mistakes. Check every number against the "
-                       "calculated results, which come from the saved models.")
-            with st.expander("Calculated results (offline summary)"):
+            st.caption("AI text can contain mistakes — check numbers against the offline "
+                       "summary, which comes straight from the models.")
+            with st.expander("Offline summary"):
                 show_offline()
-        else:
-            st.caption("Press **Generate AI summary** to request one, or switch back to the "
-                       "offline summary.")
 
-    st.write("")
-    with st.expander("Prompt comparison evidence from the notebook"):
+        with st.expander("What will be sent"):
+            st.json(snapshot)
+
+    with st.expander("Prompt comparison from the notebook"):
         counts_table = read_optional_csv(REPORTS / "prompt_pass_counts.csv")
         if counts_table is not None:
             st.dataframe(counts_table, hide_index=True, use_container_width=True)
@@ -1249,17 +1089,8 @@ with tab_summary:
 # Footer
 # --------------------------------------------------------------------------
 st.write("")
-with st.expander("About this demo"):
-    st.markdown(
-        "- **Scope:** dashboard and estimates only — no GPS, maps, route optimisation, driver "
-        "ranking, automated customer messages or delivery guarantees.\n"
-        "- **Data:** delivery records are generated classroom scenarios; images are two CIFAR-10 "
-        "classes; comments are authored teaching examples. See `source_notices/`.\n"
-        f"- **Models:** trained once in the Colab notebook and loaded from files at {LOADED_AT}. "
-        "This app never trains or refits a model.\n"
-        "- **AI summary:** optional, Groq Free Plan only; the offline summary is the default."
-    )
-html(
-    f'<div class="wb-muted" style="text-align:center;margin-top:1.2rem">{APP_NAME} · AI for '
-    "Everyone · Project 05 · demonstration data — estimates are not delivery guarantees</div>",
-)
+st.divider()
+st.caption(f"{APP_NAME} · AI for Everyone · Project 05 · Demonstration on generated classroom "
+           "data, CIFAR-10 images and authored comments. Estimates are not delivery guarantees. "
+           "No GPS, maps, route optimisation, driver ranking or customer messaging. Models are "
+           "loaded from files and never retrained in the app.")
