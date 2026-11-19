@@ -14,6 +14,7 @@ from __future__ import annotations
 import hashlib
 import html as html_lib
 import io
+from contextlib import contextmanager
 import json
 import os
 import re
@@ -38,6 +39,7 @@ SAMPLES = BASE / "sample_images"
 NLTK_DIR = BASE / "nltk_data"
 
 APP_NAME = "Waybill"
+APP_VERSION = "2.0"
 MAX_COMMENT_CHARS = 1000
 MAX_UPLOAD_MB = 5
 MAX_CSV_ROWS = 200
@@ -90,76 +92,6 @@ def html(body: str) -> None:
 # --------------------------------------------------------------------------
 # Visual style — theme-aware (works in light and dark mode)
 # --------------------------------------------------------------------------
-html(
-    """
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-html, body, [class*="css"], .stMarkdown, button, input, textarea, select, label {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.block-container { padding-top: 2rem; padding-bottom: 4rem; max-width: 1080px; }
-[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"],
-[data-testid="collapsedControl"] { display: none !important; }
-header[data-testid="stHeader"] { background: transparent; }
-footer { visibility: hidden; }
-:root { --wb-line: rgba(128,128,128,.20); --wb-soft: rgba(128,128,128,.06); --wb-accent: #EA580C; }
-.wb-hero { display:flex; align-items:center; gap:.8rem; margin-bottom:.15rem; }
-.wb-logo { width:40px; height:40px; border-radius:11px; background:var(--wb-accent); color:#fff;
-  display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.15rem; }
-.wb-name { font-size:1.45rem; font-weight:800; letter-spacing:-.02em; line-height:1.15; }
-.wb-tag { font-size:.9rem; opacity:.65; }
-.wb-title { font-size:1.2rem; font-weight:700; letter-spacing:-.01em; margin:.1rem 0 .1rem 0; }
-.wb-lead { font-size:.92rem; opacity:.65; margin-bottom:1rem; }
-.wb-label { font-size:.72rem; font-weight:600; letter-spacing:.07em; text-transform:uppercase; opacity:.55; }
-.wb-big { font-size:3rem; font-weight:800; letter-spacing:-.03em; line-height:1.05;
-  font-variant-numeric: tabular-nums; margin:.25rem 0 .2rem 0; }
-.wb-big span { font-size:1rem; font-weight:600; opacity:.55; margin-left:.35rem; letter-spacing:0; }
-.wb-note { font-size:.86rem; opacity:.65; line-height:1.5; }
-.wb-row { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.9rem; }
-.wb-tagpill { font-size:.82rem; padding:.28rem .65rem; border-radius:999px; background:var(--wb-soft);
-  border:1px solid var(--wb-line); font-variant-numeric: tabular-nums; }
-.wb-group { margin-top:1rem; padding-top:.9rem; border-top:1px solid var(--wb-line); font-size:.95rem; }
-.wb-group b { color: var(--wb-accent); }
-.wb-empty { text-align:center; padding:2.6rem 1rem; opacity:.75; }
-.wb-empty .t { font-weight:600; font-size:1rem; margin-bottom:.25rem; }
-.wb-quote { font-size:1.02rem; line-height:1.55; padding:.2rem 0 .1rem .8rem;
-  border-left:3px solid var(--wb-line); margin:.3rem 0 .8rem 0; }
-.wb-badge { display:inline-block; font-size:.8rem; font-weight:600; padding:.18rem .6rem; border-radius:999px;
-  border:1px solid var(--wb-line); background:var(--wb-soft); margin-right:.3rem; }
-.wb-badge.pos { color:#16A34A; background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.35); }
-.wb-badge.neg { color:#DC2626; background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.35); }
-.wb-badge.neu { background:rgba(148,163,184,.15); border-color:rgba(148,163,184,.4); }
-.wb-badge.warn { color:#B45309; background:rgba(245,158,11,.13); border-color:rgba(245,158,11,.4); }
-.wb-summary { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:.88rem; line-height:1.7; }
-.stTabs [data-baseweb="tab-list"] { gap:.2rem; border-bottom:1px solid var(--wb-line); overflow-x:auto; }
-.stTabs [data-baseweb="tab"] { height:auto; padding:.65rem .95rem; }
-.stTabs [data-baseweb="tab"] p { font-size:.92rem; font-weight:600; }
-.stTabs [aria-selected="true"] p { color: var(--wb-accent); }
-.stTabs [data-baseweb="tab-highlight"] { background-color: var(--wb-accent); }
-.stTabs [data-baseweb="tab-panel"] { padding-top: 1.5rem; }
-[data-testid="stVerticalBlockBorderWrapper"] { border-radius:14px; }
-[data-testid="stMetric"] { padding:.15rem 0; }
-[data-testid="stMetricLabel"] p { font-size:.78rem; opacity:.7; }
-[data-testid="stMetricValue"] { font-size:1.6rem; font-variant-numeric: tabular-nums; }
-.stButton > button, .stDownloadButton > button { border-radius:10px; font-weight:600; }
-.stButton > button[kind="primary"] { background: var(--wb-accent); border-color: var(--wb-accent); }
-[data-testid="stExpander"] details { border-radius:12px; }
-</style>
-"""
-)
-
-
-def esc(value) -> str:
-    """Escape any text before it goes inside custom HTML (line breaks become <br>)."""
-    return html_lib.escape(str(value)).replace("\n", "<br>")
-
-
-def title(text: str, lead: str = "") -> None:
-    lead_html = f'<div class="wb-lead">{esc(lead)}</div>' if lead else ""
-    html(f'<div class="wb-title">{esc(text)}</div>{lead_html}')
-
-
-def show_chart(chart) -> None:
-    st.altair_chart(chart.configure_view(strokeWidth=0), use_container_width=True)
 
 
 # --------------------------------------------------------------------------
@@ -319,8 +251,41 @@ def group_profiles() -> tuple[pd.DataFrame, pd.DataFrame]:
     rows["group"] = CLUSTERS.predict(rows[CLUSTER_FEATURES])
     table = rows.groupby("group")[CLUSTER_FEATURES].mean().round(2)
     table.insert(0, "jobs", rows.groupby("group").size())
+    # Average duration is only used to describe each group; it was never a clustering input.
+    table["minutes"] = TRAIN[TARGET].groupby(rows["group"]).mean().round(1)
+    # Typical weight range = the middle half of the jobs in each group (25th–75th percentile).
+    table["w_lo"] = rows.groupby("group")["weight_kg"].quantile(0.25).round(0)
+    table["w_hi"] = rows.groupby("group")["weight_kg"].quantile(0.75).round(0)
     table.insert(1, "description", [group_text(g) for g in table.index])
     return rows, table
+
+
+def friendly_profile(group: int) -> dict:
+    """Plain-English name and description for a group, worked out from its averages
+    compared with the usual (average) training job, so it always matches the numbers."""
+    _, table = group_profiles()
+    cols = CLUSTER_FEATURES + [TARGET]
+    usual, spread = TRAIN[cols].mean(), TRAIN[cols].std()
+    r = table.loc[group]
+    traffic_z = (r["traffic_index"] - usual["traffic_index"]) / spread["traffic_index"]
+    weight_z = (r["weight_kg"] - usual["weight_kg"]) / spread["weight_kg"]
+    w = f"{r['w_lo']:.0f}–{r['w_hi']:.0f} kg"
+    if traffic_z >= 0.35:
+        icon, name, what = "🚦", "Mixed parcels", f"Mostly {w}, on busy roads."
+    elif weight_z >= 0.35:
+        icon, name, what = "📦", "Heavy parcels", f"Mostly {w}, on quiet roads."
+    elif weight_z <= -0.35:
+        icon, name, what = "✉️", "Light parcels", f"Mostly {w}, on quiet roads."
+    else:
+        icon, name, what = "🧭", "Medium parcels", f"Mostly {w}, on normal roads."
+    if table["minutes"].idxmin() == group:
+        timing = "fastest"
+    elif table["minutes"].idxmax() == group:
+        timing = "slowest"
+    else:
+        timing = "average"
+    return {"icon": icon, "name": name, "what": what, "timing": timing,
+            "minutes": float(r["minutes"]), "jobs": int(r["jobs"])}
 
 
 @st.cache_data(show_spinner=False)
@@ -434,23 +399,39 @@ def build_snapshot(estimate: dict | None, counts: dict, topics: dict, n_scored: 
     return snap
 
 
+TOPIC_WORDS = {
+    "timeliness": "delivery times (late or delayed)",
+    "parcel": "the parcels (packages, damage)",
+    "service": "staff and service",
+    "none": "nothing in particular",
+}
+
+
 def offline_summary(snap: dict) -> str:
-    lines = ["OFFLINE SUMMARY  ·  fixed template, not AI-generated", ""]
+    """A plain-English report filled in by Python from the results (not written by AI)."""
+    lines = ["OFFLINE SUMMARY", "Written by the app from the results, not by AI.", ""]
+    lines.append("THIS JOB")
     if snap["estimated_duration_minutes"] is None:
-        lines.append("Estimated duration:  not calculated yet (use tab 1)")
+        lines.append("  No job checked yet. Use the first tab to get a time estimate.")
     else:
-        lines.append(f"Estimated duration:  {snap['estimated_duration_minutes']:.1f} minutes "
-                     f"({snap['vehicle']})")
-        lines.append(f"Delivery group:      {snap['delivery_group']} — {snap['group_description']}")
+        lines.append(f"  Expected time: about {snap['estimated_duration_minutes']:.0f} minutes "
+                     f"by {snap['vehicle']}")
+        try:
+            p = friendly_profile(int(snap["delivery_group"]))
+            lines.append(f"  Job type: {p['name']}. {p['what']}")
+        except Exception:  # noqa: BLE001
+            lines.append(f"  Job type: {snap['group_description']}")
     c = snap["sentiment_counts"]
+    topic = TOPIC_WORDS.get(snap["most_common_named_topic"], snap["most_common_named_topic"])
     lines += [
         "",
-        f"Customer comments scored: {snap['comments_scored']}",
-        f"  positive {c['positive']}   neutral {c['neutral']}   negative {c['negative']}",
-        f"Most common named topic: {snap['most_common_named_topic']}",
+        f"WHAT CUSTOMERS ARE SAYING ({snap['comments_scored']} comments)",
+        f"  Happy: {c['positive']}   Neutral: {c['neutral']}   Unhappy: {c['negative']}",
+        f"  Talked about most: {topic}",
         "",
-        "Demonstration results on generated classroom data.",
-        "The estimate is not a delivery guarantee.",
+        "GOOD TO KNOW",
+        "  These are practice results from classroom data.",
+        "  The time is an estimate, not a promise to the customer.",
     ]
     return "\n".join(lines)
 
@@ -481,27 +462,348 @@ def explain_api_error(exc: Exception) -> str:
         import groq
 
         if isinstance(exc, groq.RateLimitError):
-            return "The Groq free-plan rate limit was reached. Try again later."
+            return "The free AI service has reached its limit for now. Try again later."
         if isinstance(exc, groq.AuthenticationError):
-            return "The Groq API key was rejected. Check GROQ_API_KEY in Streamlit secrets."
+            return "The AI key in the app settings was not accepted."
         if isinstance(exc, groq.APITimeoutError):
-            return "The Groq request timed out after 20 seconds."
+            return "The AI took too long to reply."
         if isinstance(exc, groq.APIConnectionError):
-            return "Could not connect to Groq (network error)."
+            return "The app could not reach the AI service. Check the internet connection."
         if isinstance(exc, groq.APIStatusError):
-            return f"Groq returned an error (status {exc.status_code})."
+            return "The AI service had a problem (error " + str(exc.status_code) + ")."
     except ImportError:
-        return "The groq package is not installed."
+        return "The AI add-on (groq) is not installed."
     if isinstance(exc, ValueError):
-        return "Groq returned an empty response."
-    return f"The AI summary failed ({type(exc).__name__})."
+        return "The AI sent back an empty reply."
+    return "Something went wrong with the AI summary."
 
 
+html(
+    """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+html, body, [class*="css"], .stMarkdown, button, input, textarea, select, label {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+:root { --wb-accent:#EA580C; --wb-accent2:#F97316; --wb-line: rgba(128,128,128,.22);
+  --wb-soft: rgba(128,128,128,.07); --wb-glass: rgba(128,128,128,.075);
+  --wb-shadow: 0 10px 30px rgba(15,23,42,.10); --wb-ease: cubic-bezier(.16,1,.3,1);
+  --wb-soft-ease: cubic-bezier(.45,0,.2,1); }
+html { scroll-behavior: smooth; }
+
+/* ---------- layout ---------- */
+.block-container { padding-top: 2rem; padding-bottom: 4rem; max-width: 1080px; }
+[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] { display:none !important; }
+header[data-testid="stHeader"], [data-testid="stAppViewContainer"], [data-testid="stMain"],
+.main { background: transparent !important; }
+.stApp { isolation: isolate; }
+footer { visibility:hidden; }
+
+/* ---------- animated background ---------- */
+.stApp::before { content:""; position:fixed; inset:-20%; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(38% 34% at 18% 22%, rgba(249,115,22,.22), transparent 70%),
+    radial-gradient(34% 32% at 82% 18%, rgba(14,165,233,.18), transparent 70%),
+    radial-gradient(40% 38% at 70% 85%, rgba(168,85,247,.14), transparent 72%),
+    radial-gradient(30% 30% at 10% 90%, rgba(34,197,94,.10), transparent 70%);
+  filter: blur(40px); will-change: transform;
+  animation: wbDrift 42s var(--wb-soft-ease) infinite alternate; }
+@keyframes wbDrift {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  50%  { transform: translate3d(3%,-2%,0) scale(1.06); }
+  100% { transform: translate3d(-3%,2%,0) scale(1.02); } }
+
+/* ---------- header ---------- */
+.wb-hero { display:flex; align-items:center; gap:.85rem; margin-bottom:.2rem;
+  animation: wbFade .9s var(--wb-ease) both; }
+.wb-logo { width:44px; height:44px; border-radius:13px; color:#fff; font-weight:800; font-size:1.2rem;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg, var(--wb-accent2), var(--wb-accent));
+  box-shadow: 0 8px 22px rgba(234,88,12,.35), inset 0 1px 0 rgba(255,255,255,.35);
+  animation: wbFloat 7s var(--wb-soft-ease) infinite; }
+@keyframes wbFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.wb-name { font-size:1.55rem; font-weight:800; letter-spacing:-.025em; line-height:1.1; }
+.wb-tag { font-size:.9rem; opacity:.65; }
+
+/* ---------- text ---------- */
+.wb-title { font-size:1.25rem; font-weight:700; letter-spacing:-.015em; margin:.1rem 0 .1rem 0;
+  animation: wbFade .8s var(--wb-ease) both; }
+.wb-lead { font-size:.92rem; opacity:.65; margin-bottom:1.1rem; animation: wbFade .8s var(--wb-ease) .06s both; }
+.wb-label { font-size:.72rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; opacity:.55; }
+.wb-big { font-size:3.1rem; font-weight:800; letter-spacing:-.035em; line-height:1.05; margin:.3rem 0 .2rem 0;
+  font-variant-numeric: tabular-nums; background: linear-gradient(135deg, var(--wb-accent2), var(--wb-accent));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation: wbPop .9s var(--wb-ease) both; }
+.wb-big span { font-size:1rem; font-weight:600; margin-left:.35rem; letter-spacing:0;
+  color: rgb(128,128,128); -webkit-text-fill-color: rgb(128,128,128); }
+.wb-note { font-size:.86rem; opacity:.65; line-height:1.5; }
+.wb-row { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.9rem; }
+.wb-tagpill { font-size:.82rem; padding:.3rem .7rem; border-radius:999px; background:var(--wb-glass);
+  border:1px solid var(--wb-line); font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); }
+.wb-group { margin-top:1rem; padding-top:.9rem; border-top:1px solid var(--wb-line); font-size:.95rem; }
+.wb-group b { color: var(--wb-accent); }
+.wb-empty { text-align:center; padding:2.6rem 1rem; opacity:.8; }
+.wb-empty .t { font-weight:600; font-size:1rem; margin-bottom:.25rem; }
+.wb-quote { font-size:1.02rem; line-height:1.55; padding:.2rem 0 .1rem .85rem;
+  border-left:3px solid var(--wb-accent); margin:.35rem 0 .8rem 0; }
+.wb-badge { display:inline-block; font-size:.8rem; font-weight:600; padding:.2rem .65rem; border-radius:999px;
+  border:1px solid var(--wb-line); background:var(--wb-soft); margin-right:.3rem; }
+.wb-badge.pos { color:#16A34A; background:rgba(34,197,94,.13); border-color:rgba(34,197,94,.35); }
+.wb-badge.neg { color:#DC2626; background:rgba(239,68,68,.13); border-color:rgba(239,68,68,.35); }
+.wb-badge.neu { background:rgba(148,163,184,.16); border-color:rgba(148,163,184,.4); }
+.wb-badge.warn { color:#B45309; background:rgba(245,158,11,.14); border-color:rgba(245,158,11,.4); }
+.wb-info { display:grid; grid-template-columns:auto 1fr; gap:.35rem .9rem; font-size:.88rem;
+  padding:.7rem 0 .55rem 0; border-top:1px solid var(--wb-line); margin-top:.5rem; }
+.wb-info .k { opacity:.6; }
+.wb-info .v { font-weight:600; text-align:right; font-variant-numeric: tabular-nums; }
+/* job-type cards: every part has a fixed height, so all three cards are the same size */
+.wb-pcard { display:flex; flex-direction:column; }
+.wb-pbadge { height:1.55rem; }                       /* space kept even when there is no badge */
+.wb-pname { font-size:1.02rem; font-weight:700; line-height:1.3; height:1.35rem;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.wb-pdesc { margin-top:.15rem; line-height:1.5; height:3em; overflow:hidden; }
+.wb-ptime { display:flex; align-items:baseline; gap:.45rem; margin:.8rem 0 .2rem 0; }
+.wb-ptime .n { font-size:1.9rem; font-weight:800; letter-spacing:-.02em; color: var(--wb-accent);
+  font-variant-numeric: tabular-nums; }
+.wb-prow { display:flex; justify-content:space-between; align-items:center; gap:.5rem;
+  padding:.38rem 0; border-top:1px solid var(--wb-line); font-size:.88rem; }
+.wb-prow .k { opacity:.7; }
+.wb-prow .v { font-weight:600; font-variant-numeric: tabular-nums; margin-left:auto; }
+.wb-diff { font-size:.74rem; font-weight:600; padding:.12rem .5rem; border-radius:999px; white-space:nowrap;
+  min-width:5.6rem; text-align:center; }
+.wb-diff.up { color:#DC2626; background:rgba(239,68,68,.13); }
+.wb-diff.down { color:#16A34A; background:rgba(34,197,94,.13); }
+.wb-diff.same { opacity:.6; background:var(--wb-soft); }
+.wb-you { display:inline-block; font-size:.72rem; font-weight:700; color:#fff; padding:.15rem .55rem;
+  border-radius:999px; background: linear-gradient(135deg, var(--wb-accent2), var(--wb-accent)); }
+/* ---------- job-type card animation ---------- */
+/* cards rise in one after another; inside each card the number pops and the rows slide in */
+[data-testid="column"]:nth-child(2) .wb-pcard, [data-testid="stColumn"]:nth-child(2) .wb-pcard { --wb-d:.12s; }
+[data-testid="column"]:nth-child(3) .wb-pcard, [data-testid="stColumn"]:nth-child(3) .wb-pcard { --wb-d:.24s; }
+.wb-pcard { animation: wbCardIn .8s var(--wb-ease) var(--wb-d, 0s) both; }
+.wb-pcard .wb-ptime .n { display:inline-block;
+  animation: wbPop .9s var(--wb-ease) calc(var(--wb-d, 0s) + .2s) both;
+  transition: transform .45s var(--wb-ease), text-shadow .45s ease; }
+.wb-pcard .wb-info > span { animation: wbRowIn .55s var(--wb-ease) both; }
+.wb-pcard .wb-info > span:nth-child(-n+2) { animation-delay: calc(var(--wb-d, 0s) + .30s); }
+.wb-pcard .wb-info > span:nth-child(n+3):nth-child(-n+4) { animation-delay: calc(var(--wb-d, 0s) + .38s); }
+.wb-pcard .wb-info > span:nth-child(n+5):nth-child(-n+6) { animation-delay: calc(var(--wb-d, 0s) + .46s); }
+.wb-pcard .wb-info > span:nth-child(n+7) { animation-delay: calc(var(--wb-d, 0s) + .54s); }
+.wb-picon { display:inline-block; transition: transform .5s var(--wb-ease); }
+/* on hover: icon bounces, number grows and glows */
+[data-testid="stVerticalBlockBorderWrapper"]:hover .wb-picon { transform: translateY(-3px) rotate(-10deg) scale(1.18); }
+[data-testid="stVerticalBlockBorderWrapper"]:hover .wb-pcard .wb-ptime .n {
+  transform: scale(1.06); text-shadow: 0 0 18px rgba(234,88,12,.45); }
+/* the "Your job" badge gently glows */
+.wb-pcard .wb-you { animation: wbGlow 2.6s ease-in-out infinite; }
+@keyframes wbCardIn { from { opacity:0; transform: translate3d(0,18px,0) scale(.97); }
+  to { opacity:1; transform:none; } }
+@keyframes wbRowIn { from { opacity:0; transform: translate3d(0,6px,0); } to { opacity:1; transform:none; } }
+@keyframes wbGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(234,88,12,.0); }
+  50% { box-shadow: 0 0 0 5px rgba(234,88,12,.22); } }
+.wb-summary { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:.88rem; line-height:1.7; }
+
+/* ---------- glass cards (only containers created with card()) ---------- */
+.element-container:has(.wb-glass), [data-testid="stElementContainer"]:has(.wb-glass) { display:none; }
+[data-testid="stVerticalBlockBorderWrapper"]:has(.wb-glass):not(:has([data-testid="stVerticalBlockBorderWrapper"] .wb-glass)) {
+  background: var(--wb-glass); border:1px solid var(--wb-line) !important; border-radius:18px;
+  backdrop-filter: blur(16px) saturate(150%); -webkit-backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: var(--wb-shadow), inset 0 1px 0 rgba(255,255,255,.10);
+  transition: transform .55s var(--wb-ease), box-shadow .55s var(--wb-ease), border-color .45s ease;
+  animation: wbFade .8s var(--wb-ease) both; will-change: transform; }
+[data-testid="stVerticalBlockBorderWrapper"]:has(.wb-glass):not(:has([data-testid="stVerticalBlockBorderWrapper"] .wb-glass)):hover {
+  transform: translateY(-3px); box-shadow: 0 18px 44px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,.12);
+  border-color: rgba(234,88,12,.35) !important; }
+
+/* ---------- tabs as a glass pill bar ---------- */
+.stTabs [data-baseweb="tab-list"] { gap:.25rem; padding:.35rem; border-radius:999px; overflow-x:auto;
+  background: var(--wb-glass); border:1px solid var(--wb-line);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.stTabs [data-baseweb="tab"] { height:auto; padding:.55rem 1rem; border-radius:999px; white-space:nowrap;
+  transition: background .45s var(--wb-ease), box-shadow .45s var(--wb-ease), transform .35s var(--wb-ease); }
+.stTabs [data-baseweb="tab"]:hover { background: rgba(234,88,12,.10); }
+.stTabs [data-baseweb="tab"] p { font-size:.88rem; font-weight:600; }
+.stTabs [aria-selected="true"] { background: linear-gradient(135deg, var(--wb-accent2), var(--wb-accent));
+  box-shadow: 0 6px 16px rgba(234,88,12,.30); }
+.stTabs [aria-selected="true"] p { color:#fff !important; }
+.stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"] { display:none; }
+.stTabs [data-baseweb="tab-panel"] { padding-top:1.6rem; animation: wbFade .7s var(--wb-ease) both; }
+
+/* ---------- buttons ---------- */
+.stButton > button, .stDownloadButton > button {
+  border-radius:12px; font-weight:600; padding:.6rem 1.1rem; border:1px solid var(--wb-line);
+  background: var(--wb-glass); backdrop-filter: blur(10px); color: inherit;
+  transition: transform .4s var(--wb-ease), box-shadow .45s var(--wb-ease), filter .3s ease,
+    border-color .35s ease; }
+.stButton > button:hover, .stDownloadButton > button:hover { transform: translateY(-2px);
+  border-color: rgba(234,88,12,.45); box-shadow: 0 8px 20px rgba(15,23,42,.12); }
+.stButton > button:active, .stDownloadButton > button:active { transform: translateY(0) scale(.98); transition-duration: .12s; }
+.stButton > button[kind="primary"], [data-testid="stBaseButton-primary"] {
+  background: linear-gradient(135deg, var(--wb-accent2), var(--wb-accent)) !important;
+  border: none !important; color:#fff !important;
+  box-shadow: 0 8px 22px rgba(234,88,12,.35), inset 0 1px 0 rgba(255,255,255,.25); }
+.stButton > button[kind="primary"]:hover, [data-testid="stBaseButton-primary"]:hover {
+  filter: brightness(1.06); box-shadow: 0 12px 28px rgba(234,88,12,.45), inset 0 1px 0 rgba(255,255,255,.25); }
+
+/* ---------- inputs, metrics, expanders ---------- */
+[data-baseweb="input"], [data-baseweb="select"] > div, [data-baseweb="textarea"] {
+  border-radius:12px !important; transition: box-shadow .35s var(--wb-ease), border-color .35s ease; }
+[data-baseweb="input"]:focus-within, [data-baseweb="select"] > div:focus-within,
+[data-baseweb="textarea"]:focus-within { box-shadow: 0 0 0 3px rgba(234,88,12,.22) !important;
+  border-color: var(--wb-accent) !important; }
+[data-testid="stMetric"] { background: var(--wb-glass); border:1px solid var(--wb-line); border-radius:16px;
+  padding:.8rem 1rem; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  animation: wbFade .8s var(--wb-ease) both; transition: transform .5s var(--wb-ease); }
+[data-testid="stMetric"]:hover { transform: translateY(-2px); }
+[data-testid="stMetricLabel"] p { font-size:.78rem; opacity:.7; }
+[data-testid="stMetricValue"] { font-size:1.6rem; font-weight:700; font-variant-numeric: tabular-nums; }
+[data-testid="stExpander"] details { border-radius:14px; background: var(--wb-glass);
+  border:1px solid var(--wb-line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+[data-testid="stExpander"] summary:hover { color: var(--wb-accent); }
+[data-testid="stProgress"] > div > div > div > div { background: linear-gradient(90deg, var(--wb-accent2), var(--wb-accent)); }
+[data-testid="stAlert"] { border-radius:14px; backdrop-filter: blur(10px); }
+
+/* ---------- motion ---------- */
+@keyframes wbFade { from { opacity:0; transform: translate3d(0,14px,0) scale(.985); }
+  to { opacity:1; transform: none; } }
+@keyframes wbPop { 0% { opacity:0; transform: scale(.92); } 60% { opacity:1; transform: scale(1.015); }
+  100% { opacity:1; transform: none; } }
+/* stagger: second and third columns arrive a moment later */
+[data-testid="column"]:nth-child(2) > div, [data-testid="stColumn"]:nth-child(2) > div,
+[data-testid="column"]:nth-child(2) [data-testid="stMetric"], [data-testid="stColumn"]:nth-child(2) [data-testid="stMetric"] { animation-delay: .08s; }
+[data-testid="column"]:nth-child(3) [data-testid="stMetric"], [data-testid="stColumn"]:nth-child(3) [data-testid="stMetric"] { animation-delay: .16s; }
+[data-testid="column"]:nth-child(4) [data-testid="stMetric"], [data-testid="stColumn"]:nth-child(4) [data-testid="stMetric"] { animation-delay: .24s; }
+[data-testid="column"]:nth-child(2) [data-testid="stVerticalBlockBorderWrapper"], [data-testid="stColumn"]:nth-child(2) [data-testid="stVerticalBlockBorderWrapper"] { animation-delay: .1s; }
+[data-testid="column"]:nth-child(3) [data-testid="stVerticalBlockBorderWrapper"], [data-testid="stColumn"]:nth-child(3) [data-testid="stVerticalBlockBorderWrapper"] { animation-delay: .2s; }
+/* ---------- cursor ---------- */
+.stApp, .stApp * { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><circle cx='10' cy='10' r='5' fill='%23EA580C' stroke='white' stroke-width='1.5'/></svg>") 10 10, auto; }
+.stApp button, .stApp a, .stApp [role='tab'], .stApp [role='switch'], .stApp [role='radio'], .stApp summary,
+.stApp [data-baseweb='select'], .stApp [data-baseweb='select'] *, .stApp label:has(input[type='checkbox']), .stApp label:has(input[type='radio']) {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'><circle cx='13' cy='13' r='7.5' fill='%23EA580C' fill-opacity='.9' stroke='white' stroke-width='1.5'/></svg>") 13 13, pointer; }
+.stApp input, .stApp textarea { cursor: text; caret-color: #F97316; }
+#wb-cursor { position:fixed; left:0; top:0; width:36px; height:36px; margin:-18px 0 0 -18px; border-radius:50%;
+  border:1.5px solid rgba(234,88,12,.55); background: rgba(234,88,12,.06); pointer-events:none; z-index:2147483646;
+  opacity:0; will-change: transform; transition: width .35s var(--wb-ease), height .35s var(--wb-ease),
+  margin .35s var(--wb-ease), background .35s ease, border-color .35s ease, opacity .4s ease; }
+#wb-cursor.on { opacity:1; }
+#wb-cursor.hover { width:54px; height:54px; margin:-27px 0 0 -27px; background: rgba(255,255,255,.10);
+  border-color: #EA580C; box-shadow: 0 0 0 1.5px rgba(255,255,255,.75), 0 6px 18px rgba(234,88,12,.25); }
+#wb-cursor.down { width:28px; height:28px; margin:-14px 0 0 -14px; background: rgba(234,88,12,.22); }
+@media (pointer: coarse) { #wb-cursor { display:none; } .stApp, .stApp * { cursor: auto; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; } #wb-cursor { display:none; } }
+</style>
+"""
+)
+
+
+DARK_CSS = """
+<style>
+:root { --wb-glass: rgba(255,255,255,.055); --wb-line: rgba(255,255,255,.13);
+  --wb-soft: rgba(255,255,255,.06); --wb-shadow: 0 12px 34px rgba(0,0,0,.45); }
+.stApp { background:#0B0F19 !important; color:#E5E7EB !important; }
+.stApp::before { opacity:1.25; }
+.stApp p, .stApp li, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp h4,
+[data-testid="stMarkdownContainer"], [data-testid="stWidgetLabel"] p,
+.wb-name, .wb-title, .wb-tag, .wb-lead, .wb-note, .wb-label, .wb-quote, .wb-group, .wb-summary,
+.wb-empty, .wb-tagpill, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] p,
+[data-testid="stExpander"] summary, [data-testid="stExpander"] summary p { color:#E5E7EB !important; }
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p { color:#9CA3AF !important; }
+.stTabs [data-baseweb="tab"] p { color:#CBD5E1 !important; }
+.stTabs [aria-selected="true"] p { color:#fff !important; }
+[data-baseweb="input"], [data-baseweb="base-input"], [data-baseweb="select"] > div,
+[data-baseweb="textarea"], [data-baseweb="textarea"] textarea, [data-baseweb="input"] input {
+  background:#161B26 !important; color:#F3F4F6 !important; border-color: rgba(255,255,255,.12) !important; }
+[data-baseweb="select"] span, [data-baseweb="select"] div { color:#F3F4F6 !important; }
+[data-baseweb="select"] svg, [data-baseweb="input"] svg { fill:#CBD5E1 !important; }
+[data-testid="stNumberInputStepDown"], [data-testid="stNumberInputStepUp"] {
+  background:#1E2533 !important; color:#E5E7EB !important; }
+[data-baseweb="popover"] ul, [data-baseweb="popover"] li, [data-baseweb="menu"] {
+  background:#161B26 !important; color:#F3F4F6 !important; }
+[data-baseweb="popover"] li:hover { background:#1E2533 !important; }
+[data-testid="stFileUploaderDropzone"] { background:#161B26 !important; color:#E5E7EB !important;
+  border-color: rgba(255,255,255,.15) !important; }
+[data-testid="stFileUploaderDropzone"] small, [data-testid="stFileUploaderDropzone"] span { color:#9CA3AF !important; }
+.stButton > button, .stDownloadButton > button { color:#E5E7EB !important; }
+.stButton > button[kind="primary"], [data-testid="stBaseButton-primary"] { color:#fff !important; }
+[data-testid="stDataFrame"], [data-testid="stTable"] { filter: invert(.92) hue-rotate(180deg); }
+[data-testid="stJson"] { background:#161B26 !important; border-radius:12px; }
+[data-testid="stAlert"] { background: rgba(255,255,255,.06) !important; }
+[data-testid="stAlert"] p { color:#E5E7EB !important; }
+header[data-testid="stHeader"] * { color:#CBD5E1 !important; }
+hr { border-color: rgba(255,255,255,.12) !important; }
+</style>
+"""
+
+
+def dark_on() -> bool:
+    return bool(st.session_state.get("dark_mode", True))
+
+
+def esc(value) -> str:
+    """Escape any text before it goes inside custom HTML (line breaks become <br>)."""
+    return html_lib.escape(str(value)).replace("\n", "<br>")
+
+
+def title(text: str, lead: str = "") -> None:
+    lead_html = f'<div class="wb-lead">{esc(lead)}</div>' if lead else ""
+    html(f'<div class="wb-title">{esc(text)}</div>{lead_html}')
+
+
+@contextmanager
+def card():
+    """A bordered container that gets the frosted-glass style."""
+    with st.container(border=True):
+        html('<span class="wb-glass"></span>')
+        yield
+
+
+def show_chart(chart) -> None:
+    chart = chart.configure_view(strokeWidth=0)
+    if dark_on():
+        ink, grid = "#CBD5E1", "rgba(255,255,255,0.08)"
+        chart = (chart.configure(background="transparent")
+                 .configure_axis(labelColor=ink, titleColor=ink, gridColor=grid,
+                                 domainColor="rgba(255,255,255,0.2)",
+                                 tickColor="rgba(255,255,255,0.2)")
+                 .configure_legend(labelColor=ink, titleColor=ink))
+        st.altair_chart(chart, use_container_width=True, theme=None)
+    else:
+        st.altair_chart(chart, use_container_width=True)
 # --------------------------------------------------------------------------
 # Session defaults
 # --------------------------------------------------------------------------
+CUSTOM_JOB = "custom"
+FORM_FIELDS = ["distance_km", "weight_kg", "traffic_index", "stops_count", "vehicle"]
+
+
+def matching_example(record: dict) -> str | None:
+    """Return the example whose values equal the form, or None if nothing matches."""
+    for _, ex in EXAMPLES.iterrows():
+        try:
+            same = all(
+                str(record[f]).strip().lower() == str(ex[f]).strip().lower() if f == "vehicle"
+                else round(float(record[f]), 1) == round(float(ex[f]), 1)
+                for f in FORM_FIELDS
+            )
+        except (TypeError, ValueError):
+            same = False
+        if same:
+            return str(ex["record_id"])
+    return None
+
+
+def sync_example_choice() -> None:
+    """Runs whenever a job field changes: switch the picker to Custom job
+    (or back to an example if the values match one exactly)."""
+    st.session_state["example_id"] = matching_example(current_form_record()) or CUSTOM_JOB
+
+
 def load_example_into_form() -> None:
     record_id = st.session_state.get("example_id")
+    if record_id == CUSTOM_JOB:
+        return  # keep whatever the worker has typed
     row = EXAMPLES[EXAMPLES["record_id"] == record_id]
     if row.empty:
         return
@@ -531,27 +833,41 @@ def current_form_record() -> dict:
 
 
 def example_label(record_id: str) -> str:
+    if record_id == CUSTOM_JOB:
+        return "Custom job (your own values)"
     r = EXAMPLES[EXAMPLES["record_id"] == record_id].iloc[0]
     return (f"{record_id} — {r['distance_km']:g} km, {r['weight_kg']:g} kg, "
             f"traffic {int(r['traffic_index'])}, {int(r['stops_count'])} stops, {r['vehicle']}")
 
 
 def group_name(group: int) -> str:
-    """Short profile name, without the averages in brackets."""
-    return group_text(group).split(" (")[0]
+    """Short, plain-English profile name used across the app."""
+    try:
+        p = friendly_profile(int(group))
+        return f"{p['icon']} {p['name']}"
+    except Exception:  # noqa: BLE001 - fall back to the saved description
+        return group_text(group).split(" (")[0]
 
 
 # --------------------------------------------------------------------------
 # Header
 # --------------------------------------------------------------------------
 estimate_now = st.session_state.get("estimate")
-html(
-    '<div class="wb-hero"><div class="wb-logo">W</div><div>'
-    f'<div class="wb-name">{APP_NAME}</div>'
-    '<div class="wb-tag">Delivery estimates and service review for a small courier office</div>'
-    "</div></div>"
-)
-status = ["Works offline", "Demonstration data", f"Models loaded at {LOADED_AT}"]
+brand_col, toggle_col = st.columns([5, 1], vertical_alignment="center")
+with brand_col:
+    html(
+        '<div class="wb-hero"><div class="wb-logo">W</div><div>'
+        f'<div class="wb-name">{APP_NAME}</div>'
+        '<div class="wb-tag">Delivery estimates and service review for a small courier office</div>'
+        "</div></div>"
+    )
+st.session_state.setdefault("dark_mode", True)  # the app opens in dark mode
+with toggle_col:
+    st.toggle("Dark mode", key="dark_mode", help="Switch between dark and light colours.")
+if dark_on():
+    html(DARK_CSS)
+status = ["Works offline", "Demonstration data", f"Models loaded at {LOADED_AT}",
+          f"Version {APP_VERSION}"]
 if estimate_now:
     status.insert(0, f"Current job: **{estimate_now['minutes']:.1f} min**")
 st.caption("  ·  ".join(status))
@@ -573,21 +889,27 @@ with tab_overview:
 
     form_col, result_col = st.columns([1, 1], gap="large")
     with form_col:
-        with st.container(border=True):
-            st.selectbox("Start from an example", EXAMPLES["record_id"].tolist(),
+        with card():
+            st.selectbox("Start from an example",
+                         EXAMPLES["record_id"].tolist() + [CUSTOM_JOB],
                          key="example_id", on_change=load_example_into_form,
                          format_func=example_label)
             a, b = st.columns(2)
             a.number_input("Distance (km)", step=0.1, format="%.1f", key="f_distance_km",
+                           on_change=sync_example_choice,
                            help=f"Allowed {fmt_num(RANGES['distance_km'][0])}–"
                                 f"{fmt_num(RANGES['distance_km'][1])} km")
             b.number_input("Parcel weight (kg)", step=0.1, format="%.1f", key="f_weight_kg",
+                           on_change=sync_example_choice,
                            help=f"Allowed {fmt_num(RANGES['weight_kg'][0])}–"
                                 f"{fmt_num(RANGES['weight_kg'][1])} kg")
             a.number_input("Traffic (1–5)", step=1, key="f_traffic_index",
+                           on_change=sync_example_choice,
                            help="1 = light traffic, 5 = heavy traffic")
-            b.number_input("Stops (0–5)", step=1, key="f_stops_count")
+            b.number_input("Stops (0–5)", step=1, key="f_stops_count",
+                           on_change=sync_example_choice)
             st.selectbox("Vehicle", CATEGORIES["vehicle"], key="f_vehicle",
+                         on_change=sync_example_choice,
                          format_func=str.capitalize,
                          help="You can also confirm this in the Vehicle image tab.")
             estimate_clicked = st.button("Estimate duration", type="primary",
@@ -607,7 +929,7 @@ with tab_overview:
     with result_col:
         errors = st.session_state.get("form_errors", [])
         estimate = st.session_state.get("estimate")
-        with st.container(border=True):
+        with card():
             if errors:
                 st.error("**Please check these values:**\n\n"
                          + "\n".join(f"- {e}" for e in errors))
@@ -627,7 +949,7 @@ with tab_overview:
                     f'<span class="wb-tagpill">traffic {rec["traffic_index"]}</span>'
                     f'<span class="wb-tagpill">{rec["stops_count"]} stops</span>'
                     f'<span class="wb-tagpill">{esc(rec["vehicle"])}</span></div>'
-                    f'<div class="wb-group">Profile: <b>{esc(group_name(estimate["group"]))}</b>'
+                    f'<div class="wb-group">Job type: <b>{esc(group_name(estimate["group"]))}</b>'
                     f' <span class="wb-note">(group {estimate["group"]})</span></div>'
                 )
                 if validate_record(current_form_record())[0] != rec:
@@ -714,23 +1036,100 @@ with tab_overview:
 # Tab 2 — Delivery profiles (KMeans, 3 groups)
 # ==========================================================================
 with tab_profiles:
-    title("What kind of job is it?",
-          "Jobs are grouped into three profiles by distance, weight, traffic and stops.")
+    title("What type of job is this?",
+          "Most jobs fit one of three types. Yours is matched to the closest one.")
     rows, profile_table = group_profiles()
     estimate = st.session_state.get("estimate")
     current = estimate["group"] if estimate else None
 
-    cols = st.columns(len(profile_table), gap="medium")
-    for col, (g, r) in zip(cols, profile_table.iterrows()):
-        with col:
-            with st.container(border=True):
-                marker = "  ← this job" if current == g else ""
-                st.markdown(f"**{group_name(g)}**{marker}")
-                st.caption(f"Group {g} · {int(r['jobs'])} jobs")
-                st.markdown(f"{r['distance_km']:.0f} km · {r['weight_kg']:.1f} kg  \n"
-                            f"traffic {r['traffic_index']:.1f} · {r['stops_count']:.1f} stops")
+    # Compare each group's average job with the usual (average) training job.
+    usual = TRAIN[CLUSTER_FEATURES + [TARGET]].mean()
+    spread = TRAIN[CLUSTER_FEATURES + [TARGET]].std()
+    def traffic_word(level: float) -> str:
+        return "Quiet" if level < 2.5 else ("Busy" if level > 3.5 else "Medium")
+
+    # All three cards are drawn in ONE grid. A CSS grid row always makes its boxes the
+    # same height, so the cards are always the same size, whatever text they hold.
+    # The grid carries its own styles and animations, so nothing else can override them.
+    JOB_CSS = """
+<style>
+.wb-jobgrid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:1rem;
+  align-items:stretch; margin:.6rem 0 .8rem 0; }
+@media (max-width: 760px) { .wb-jobgrid { grid-template-columns:1fr; } }
+.wb-jobgrid .wb-job { position:relative; display:flex; flex-direction:column;
+  padding:1.15rem 1.25rem 1rem 1.25rem; border-radius:18px; background:var(--wb-glass);
+  border:1px solid var(--wb-line); box-shadow:var(--wb-shadow);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  animation:wbJobIn .8s cubic-bezier(.16,1,.3,1) both !important;
+  animation-delay:calc(var(--i) * .13s) !important;
+  transition:transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s ease,
+    border-color .4s ease !important; }
+.wb-jobgrid .wb-job:hover { transform:translateY(-6px); border-color:rgba(234,88,12,.55);
+  box-shadow:0 20px 44px rgba(0,0,0,.30); }
+.wb-jobgrid .wb-job.is-you { border-color:rgba(234,88,12,.75); }
+.wb-jobgrid .wb-job .you { position:absolute; top:-.65rem; right:1rem; font-size:.7rem; font-weight:700;
+  color:#fff; padding:.2rem .6rem; border-radius:999px;
+  background:linear-gradient(135deg, #F97316, #EA580C);
+  animation:wbJobGlow 2.4s ease-in-out infinite !important; }
+.wb-jobgrid .wb-job .nm { font-size:1.05rem; font-weight:700; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; }
+.wb-jobgrid .wb-job .ic { display:inline-block;
+  transition:transform .5s cubic-bezier(.16,1,.3,1) !important; }
+.wb-jobgrid .wb-job:hover .ic { transform:translateY(-3px) rotate(-10deg) scale(1.2); }
+.wb-jobgrid .wb-job .ds { font-size:.86rem; opacity:.7; margin-top:.2rem; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; }
+.wb-jobgrid .wb-job .tm { display:flex; align-items:baseline; gap:.45rem; margin:.9rem 0 .8rem 0; }
+.wb-jobgrid .wb-job .tm b { display:inline-block; font-size:2rem; font-weight:800; color:#EA580C;
+  letter-spacing:-.02em; font-variant-numeric:tabular-nums;
+  animation:wbJobPop .9s cubic-bezier(.16,1,.3,1) both !important;
+  animation-delay:calc(var(--i) * .13s + .25s) !important;
+  transition:transform .4s ease, text-shadow .4s ease !important; }
+.wb-jobgrid .wb-job:hover .tm b { transform:scale(1.08); text-shadow:0 0 18px rgba(234,88,12,.5); }
+.wb-jobgrid .wb-job .tm span { font-size:.85rem; opacity:.65; }
+.wb-jobgrid .wb-job .rows { display:grid; grid-template-columns:auto 1fr; gap:.42rem .9rem;
+  margin-top:auto; padding-top:.75rem; border-top:1px solid var(--wb-line); font-size:.88rem; }
+.wb-jobgrid .wb-job .rows > span { animation:wbJobRow .55s cubic-bezier(.16,1,.3,1) both !important;
+  animation-delay:calc(var(--i) * .13s + .35s + var(--r) * .07s) !important; }
+.wb-jobgrid .wb-job .rows .k { opacity:.6; }
+.wb-jobgrid .wb-job .rows .v { font-weight:600; text-align:right; font-variant-numeric:tabular-nums; }
+@keyframes wbJobIn { from { opacity:0; transform:translate3d(0,22px,0) scale(.96); }
+  to { opacity:1; transform:none; } }
+@keyframes wbJobPop { 0% { opacity:0; transform:scale(.8); } 60% { opacity:1; transform:scale(1.06); }
+  100% { opacity:1; transform:none; } }
+@keyframes wbJobRow { from { opacity:0; transform:translate3d(0,6px,0); } to { opacity:1; transform:none; } }
+@keyframes wbJobGlow { 0%, 100% { box-shadow:0 0 0 0 rgba(234,88,12,0); }
+  50% { box-shadow:0 0 0 6px rgba(234,88,12,.25); } }
+</style>
+"""
+    cards = []
+    for i, (g, r) in enumerate(profile_table.iterrows()):
+        p = friendly_profile(g)
+        info = [
+            ("Weight", f"{r['weight_kg']:.1f} kg on average"),
+            ("Traffic", f"{traffic_word(r['traffic_index'])} ({r['traffic_index']:.1f} of 5)"),
+            ("Distance", f"about {r['distance_km']:.0f} km"),
+            ("Stops", f"about {r['stops_count']:.0f}"),
+        ]
+        rows_html = "".join(
+            f'<span class="k" style="--r:{n}">{k}</span>'
+            f'<span class="v" style="--r:{n}">{esc(v)}</span>'
+            for n, (k, v) in enumerate(info))
+        is_you = current == g
+        cards.append(
+            f'<div class="wb-job{" is-you" if is_you else ""}" style="--i:{i}">'
+            + ('<span class="you">Your job</span>' if is_you else "")
+            + f'<div class="nm"><span class="ic">{p["icon"]}</span> {esc(p["name"])}</div>'
+            f'<div class="ds">{esc(p["what"])}</div>'
+            f'<div class="tm"><b>{p["minutes"]:.0f} min</b>'
+            f'<span>usually · {p["timing"]}</span></div>'
+            f'<div class="rows">{rows_html}</div>'
+            "</div>"
+        )
+    html(JOB_CSS + '<div class="wb-jobgrid">' + "".join(cards) + "</div>")
+    st.caption(f"Times are averages from {len(TRAIN)} past jobs "
+               f"(a usual job takes about {usual[TARGET]:.0f} min).")
     if current is None:
-        st.caption("Estimate a job in the first tab to see which profile it belongs to.")
+        st.caption("Estimate a job in the first tab to see which type it is.")
 
     st.write("")
     plot = rows.assign(profile=rows["group"].map(lambda g: f"{g}: {group_name(g)}"))
@@ -764,10 +1163,10 @@ with tab_profiles:
                     "chosen from the averages in original units.\n"
                     "- Group numbers are labels, not a ranking.\n"
                     "- Grouping similar jobs is not route optimisation and does not prove a cause.")
-        shown = profile_table.drop(columns=["description"]).rename(columns={
+        shown = profile_table.drop(columns=["description", "w_lo", "w_hi"]).rename(columns={
             "distance_km": "km", "weight_kg": "kg", "traffic_index": "traffic",
-            "stops_count": "stops"})
-        shown.index = [f"Group {g}" for g in shown.index]
+            "stops_count": "stops", "minutes": "avg minutes"})
+        shown.index = [f"{group_name(g)} (group {g})" for g in shown.index]
         st.dataframe(shown, use_container_width=True)
 
 # ==========================================================================
@@ -780,7 +1179,7 @@ with tab_image:
     left, right = st.columns([1, 1], gap="large")
     image, problem, suggestion, scores = None, None, None, None
     with left:
-        with st.container(border=True):
+        with card():
             source = st.radio("Image", ["Sample image", "Upload my own"], horizontal=True,
                               key="img_source", label_visibility="collapsed")
             if source == "Sample image":
@@ -816,7 +1215,7 @@ with tab_image:
                 st.caption("Upload a PNG or JPG image, or switch to a sample.")
 
     with right:
-        with st.container(border=True):
+        with card():
             image_model_name = st.selectbox("Model", list(IMAGE_MODELS), index=0,
                                             key="img_model")
             if image is not None:
@@ -840,6 +1239,7 @@ with tab_image:
 
             def use_confirmed() -> None:
                 st.session_state["f_vehicle"] = st.session_state["img_confirm"]
+                sync_example_choice()  # vehicle changed from this tab too
 
             st.button("Use for the estimate", on_click=use_confirmed, type="primary",
                       use_container_width=True)
@@ -891,7 +1291,7 @@ with tab_comments:
         st.write("")
         pick_col, write_col = st.columns(2, gap="large")
         with pick_col:
-            with st.container(border=True):
+            with card():
                 st.markdown("**Browse a customer comment**")
                 options = table["comment_id"].tolist()
                 picked = st.selectbox(
@@ -904,7 +1304,7 @@ with tab_comments:
                 st.caption(f"Reference label: {row['sentiment_label']}")
 
         with write_col:
-            with st.container(border=True):
+            with card():
                 st.markdown("**Try your own comment**")
                 typed = st.text_area("Comment", key="comment_text", max_chars=MAX_COMMENT_CHARS,
                                      height=90, label_visibility="collapsed",
@@ -997,7 +1397,8 @@ with tab_comments:
 # Tab 5 — Service summary (offline by default, optional Groq Free Plan)
 # ==========================================================================
 with tab_summary:
-    title("Service summary", "A short summary of the results — no API key needed.")
+    title("Service summary",
+          "A short report on this job and what customers are saying. Works without internet.")
 
     analyser_ok = load_sentiment_analyser()[0] is not None
     if analyser_ok:
@@ -1008,18 +1409,18 @@ with tab_summary:
     snapshot = build_snapshot(estimate, counts, topics, n_scored)
     offline_text = offline_summary(snapshot)
 
-    mode = st.radio("Summary type", ["Offline summary", "AI summary · Groq Free Plan"],
+    mode = st.radio("Summary type", ["Offline summary", "AI summary (optional)"],
                     horizontal=True, key="summary_mode", label_visibility="collapsed")
 
     def show_offline() -> None:
-        with st.container(border=True):
+        with card():
             body = esc(offline_text).replace("  ", "&nbsp;&nbsp;")
             html(f'<div class="wb-summary">{body}</div>')
         st.download_button("Download as text", offline_text,
                            file_name="waybill_offline_summary.txt", mime="text/plain")
 
     if estimate is None:
-        st.caption("Tip: estimate a job in the first tab to include it in the summary.")
+        st.caption("Estimate a job in the first tab to add it to this summary.")
 
     if mode == "Offline summary":
         show_offline()
@@ -1030,11 +1431,12 @@ with tab_summary:
 
         g1, g2 = st.columns([2, 1], gap="large")
         with g1:
-            st.caption("Sends one request with the calculated totals only — no comment text, "
-                       "images or files. Asks for one observation, two actions and one "
-                       f"limitation in under 120 words. Model: {model_id}. Key: "
-                       f"{'set' if api_key else 'not set'}.")
-            simulate_failure = st.toggle("Test mode: simulate an API failure", value=False,
+            st.caption("The AI gets only the numbers from this page, never customer comments, "
+                       "photos or files. It writes one finding, two suggestions and one "
+                       "caution in under 120 words. "
+                       + ("AI is set up." if api_key else
+                          "AI is not set up yet, so you will see the offline summary."))
+            simulate_failure = st.toggle("Practice: pretend the AI is unavailable", value=False,
                                          key="simulate_failure")
         with g2:
             generate = st.button("Generate AI summary", type="primary",
@@ -1043,7 +1445,7 @@ with tab_summary:
         if generate:
             try:
                 if simulate_failure:
-                    raise RuntimeError("Simulated free-plan rate limit (test mode)")
+                    raise RuntimeError("This is a practice run of the AI being unavailable")
                 if not api_key:
                     raise LookupError("missing key")
                 text = call_groq(snapshot, api_key, model_id)
@@ -1051,8 +1453,8 @@ with tab_summary:
                                                   "time": datetime.now().strftime("%H:%M")}
                 st.session_state["ai_error"] = None
             except LookupError:
-                st.session_state["ai_error"] = ("No Groq API key is set (add GROQ_API_KEY "
-                                                "in the Streamlit secrets).")
+                st.session_state["ai_error"] = ("The AI has not been set up yet "
+                                                "(no GROQ_API_KEY in the app settings).")
             except RuntimeError as exc:
                 st.session_state["ai_error"] = f"{exc}."
             except Exception as exc:  # noqa: BLE001
@@ -1061,25 +1463,28 @@ with tab_summary:
         ai_error = st.session_state.get("ai_error")
         ai = st.session_state.get("ai_summary")
         if ai_error:
-            st.warning(f"**AI summary unavailable.** {ai_error} Here is the offline summary "
-                       "instead — everything else still works.")
+            st.warning(f"**The AI summary isn't available.** {ai_error} "
+                       "Here is the offline summary instead. Everything else still works.")
             show_offline()
         elif ai:
             if ai["key"] != snap_key:
-                st.info("The results changed after this summary was made. Generate again to "
-                        "update it.")
-            with st.container(border=True):
-                st.caption(f"AI-generated · Groq · {ai['time']} · {len(ai['text'].split())} words")
+                st.info("The results have changed since this was written. Press "
+                        "**Generate AI summary** again to update it.")
+            with card():
+                st.caption(f"Written by AI at {ai['time']} · {len(ai['text'].split())} words")
                 st.markdown(ai["text"])
-            st.caption("AI text can contain mistakes — check numbers against the offline "
-                       "summary, which comes straight from the models.")
+            st.caption("AI can make mistakes. Check its numbers against the offline summary, "
+                       "which comes straight from the results.")
             with st.expander("Offline summary"):
                 show_offline()
 
-        with st.expander("What will be sent"):
+        with st.expander("See exactly what is sent to the AI"):
             st.json(snapshot)
 
-    with st.expander("Prompt comparison from the notebook"):
+    with st.expander("How we chose the AI instructions"):
+        st.caption("We tested a vague request (\"Give advice\") against clear, structured "
+                   "instructions on five practice cases. The structured version was shorter, "
+                   "stuck to the real numbers and stayed on topic.")
         counts_table = read_optional_csv(REPORTS / "prompt_pass_counts.csv")
         if counts_table is not None:
             st.dataframe(counts_table, hide_index=True, use_container_width=True)
@@ -1094,3 +1499,58 @@ st.caption(f"{APP_NAME} · AI for Everyone · Project 05 · Demonstration on gen
            "data, CIFAR-10 images and authored comments. Estimates are not delivery guarantees. "
            "No GPS, maps, route optimisation, driver ranking or customer messaging. Models are "
            "loaded from files and never retrained in the app.")
+
+
+# --------------------------------------------------------------------------
+# Smooth cursor ring (decoration only; the orange dot cursor works without it)
+# --------------------------------------------------------------------------
+CURSOR_JS = """
+<script>
+(function () {
+  try {
+    var win = window.parent, doc = win.document;
+    if (win.matchMedia("(pointer: coarse)").matches ||
+        win.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
+    if (win.__wbCursor) { try { win.__wbCursor.stop(); } catch (e) {} }
+    var old = doc.getElementById("wb-cursor"); if (old) { old.remove(); }
+    var ring = doc.createElement("div"); ring.id = "wb-cursor"; doc.body.appendChild(ring);
+    var x = -100, y = -100, rx = -100, ry = -100, running = true;
+    var CLICKABLE = "button, a, [role=tab], [role=switch], [role=radio], summary, " +
+                    "[data-baseweb=select], label:has(input[type=checkbox]), label:has(input[type=radio])";
+    function move(e) {
+      x = e.clientX; y = e.clientY; ring.classList.add("on");
+      var t = e.target && e.target.closest ? e.target.closest(CLICKABLE) : null;
+      ring.classList.toggle("hover", !!t);
+    }
+    function leave() { ring.classList.remove("on"); }
+    function down() { ring.classList.add("down"); }
+    function up() { ring.classList.remove("down"); }
+    doc.addEventListener("mousemove", move, { passive: true });
+    doc.addEventListener("mouseleave", leave);
+    doc.addEventListener("mousedown", down);
+    doc.addEventListener("mouseup", up);
+    function frame() {
+      if (!running) { return; }
+      rx += (x - rx) * 0.2; ry += (y - ry) * 0.2;
+      ring.style.transform = "translate3d(" + rx.toFixed(1) + "px," + ry.toFixed(1) + "px,0)";
+      win.requestAnimationFrame(frame);
+    }
+    win.requestAnimationFrame(frame);
+    win.__wbCursor = { stop: function () {
+      running = false;
+      doc.removeEventListener("mousemove", move);
+      doc.removeEventListener("mouseleave", leave);
+      doc.removeEventListener("mousedown", down);
+      doc.removeEventListener("mouseup", up);
+      ring.remove();
+    } };
+  } catch (e) { /* blocked by the browser: the CSS dot cursor still works */ }
+})();
+</script>
+"""
+try:
+    import streamlit.components.v1 as components
+
+    components.html(CURSOR_JS, height=0)
+except Exception:  # noqa: BLE001 - purely decorative
+    pass
